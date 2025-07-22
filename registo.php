@@ -43,12 +43,25 @@ if ($_POST) {
             if ($stmt->fetch()) {
                 $errors[] = 'Email já registado.';
             } else {
-                // Inserir novo utilizador
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO utilizadores (nome, email, telefone, data_nascimento, password) VALUES (?, ?, ?, ?, ?)");
-                $stmt->execute([$nome, $email, $telefone, $data_nascimento, $hashedPassword]);
+                // Gerar token de verificação
+                $verificationToken = generateVerificationToken();
                 
-                $success = 'Registo efetuado com sucesso! Pode agora fazer login.';
+                // Inserir novo utilizador com email não verificado
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("
+                    INSERT INTO utilizadores 
+                    (nome, email, telefone, data_nascimento, password, email_verificado, token_verificacao, data_token) 
+                    VALUES (?, ?, ?, ?, ?, 0, ?, NOW())
+                ");
+                $stmt->execute([$nome, $email, $telefone, $data_nascimento, $hashedPassword, $verificationToken]);
+                
+                // Enviar email de verificação
+                if (sendVerificationEmail($email, $nome, $verificationToken)) {
+                    $success = 'Registo efetuado com sucesso! Verifique o seu email para ativar a conta.';
+                } else {
+                    $success = 'Registo efetuado! Não foi possível enviar o email de verificação. Contacte o suporte.';
+                }
+                
                 // Limpar campos
                 $nome = $email = $telefone = $data_nascimento = '';
             }

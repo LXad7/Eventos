@@ -1,0 +1,28 @@
+# Configurações para ativação do envio de emails no XAMPP
+# 
+# Para ativar o envio de emails no desenvolvimento local:
+# 
+# 1. Abra o arquivo php.ini (C:\xampp\php\php.ini)
+# 2. Encontre as linhas de configuração do sendmail e descomente/configure:
+
+[mail function]
+SMTP = localhost
+smtp_port = 25
+sendmail_from = noreply@arenafitness.com
+
+# Alternativamente, para desenvolvimento, você pode instalar o MailHog:
+# 1. Baixe o MailHog do GitHub
+# 2. Execute o MailHog na porta 1025
+# 3. Configure SMTP_PORT = 1025 no config.php
+
+# Para produção, considere usar serviços como:
+# - PHPMailer com Gmail SMTP
+# - SendGrid
+# - Mailgun
+# - Amazon SES
+
+# Exemplo de configuração para Gmail (production):
+# smtp_server = smtp.gmail.com
+# smtp_port = 587
+# smtp_username = seu-email@gmail.com  
+# smtp_password = sua-senha-de-app

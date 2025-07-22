@@ -15,28 +15,33 @@ if ($_POST) {
     
     if ($email && $password) {
         try {
-            $stmt = $pdo->prepare("SELECT id, nome, email, password, tipo_utilizador, ativo FROM utilizadores WHERE email = ? AND ativo = 1");
+            $stmt = $pdo->prepare("SELECT id, nome, email, password, tipo_utilizador, ativo, email_verificado FROM utilizadores WHERE email = ? AND ativo = 1");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
             
             if ($user && password_verify($password, $user['password'])) {
-                // Login válido
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['nome'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_type'] = $user['tipo_utilizador'];
-                
-                // Atualizar último login
-                $updateStmt = $pdo->prepare("UPDATE utilizadores SET ultimo_login = NOW() WHERE id = ?");
-                $updateStmt->execute([$user['id']]);
-                
-                // Redirecionar
-                if ($user['tipo_utilizador'] === 'administrador') {
-                    header('Location: admin/dashboard.php');
+                // Verificar se o email foi verificado
+                if ($user['email_verificado'] == 0) {
+                    $error = 'Conta não verificada. Verifique o seu email para ativar a conta.';
                 } else {
-                    header('Location: index.php');
+                    // Login válido
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_name'] = $user['nome'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['user_type'] = $user['tipo_utilizador'];
+                    
+                    // Atualizar último login
+                    $updateStmt = $pdo->prepare("UPDATE utilizadores SET ultimo_login = NOW() WHERE id = ?");
+                    $updateStmt->execute([$user['id']]);
+                    
+                    // Redirecionar
+                    if ($user['tipo_utilizador'] === 'administrador') {
+                        header('Location: admin/dashboard.php');
+                    } else {
+                        header('Location: index.php');
+                    }
+                    exit;
                 }
-                exit;
             } else {
                 $error = 'Email ou password incorretos.';
             }
@@ -85,6 +90,7 @@ if ($_POST) {
             
             <div class="login-links">
                 <p>Não tem conta? <a href="registo.php">Registar-se</a></p>
+                <p><a href="reenviar-verificacao.php">Reenviar verificação de email</a></p>
                 <p><a href="index.php">Voltar ao início</a></p>
             </div>
             
