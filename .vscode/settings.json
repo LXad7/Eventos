@@ -1,0 +1,14 @@
+{
+    "git.autofetch": true,
+    "git.autofetchPeriod": 180,
+    "git.autoStash": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "extensions.recommendations": [
+        "ms-vscode.vscode-git-graph",
+        "eamodio.gitlens",
+        "ms-vscode.vscode-json"
+    ]
+}
