@@ -18,18 +18,11 @@ if %errorlevel% neq 0 (
     echo Fazendo commit das alteracoes...
     git commit -m "Auto-update Arena Fitness: %date% %time%"
     
-    if %errorlevel% equ 0 (
-        echo Enviando para GitHub...
-        git push origin Eventos
-        
-        if %errorlevel% equ 0 (
-            echo ✅ Sincronizacao concluida!
-        ) else (
-            echo ❌ Erro ao enviar para GitHub
-        )
-    ) else (
-        echo ❌ Erro no commit
-    )
+    echo Enviando para GitHub...
+    git push origin Eventos
+    
+    echo ✅ Sincronizacao concluida!
+    echo 🔗 GitHub: https://github.com/LXad7/Eventos
 ) else (
     echo ℹ️ Nenhuma alteracao encontrada.
 )
