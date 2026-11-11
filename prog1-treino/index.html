@@ -1,0 +1,1979 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prog I · Treino</title>
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --surface2:#eef1f5; --text:#1b1f24; --muted:#5d6672;
+  --border:#d9dee5; --accent:#2457c5; --accent-weak:#e3ebfb;
+  --ok:#1d7a3e; --ok-bg:#e4f4ea; --bad:#b3261e; --bad-bg:#fbe8e6; --warn:#8a5a00; --warn-bg:#fdf1d8;
+  --code-bg:#f2f4f7; --code-text:#1b1f24;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121417; --surface:#1b1e23; --surface2:#23272e; --text:#e6e8eb; --muted:#9aa3ae;
+    --border:#30353d; --accent:#7aa2ff; --accent-weak:#1f2a44;
+    --ok:#5fd28a; --ok-bg:#16301f; --bad:#ff8a80; --bad-bg:#3a1a18; --warn:#f5c35b; --warn-bg:#3a2e12;
+    --code-bg:#15181c; --code-text:#e6e8eb;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121417; --surface:#1b1e23; --surface2:#23272e; --text:#e6e8eb; --muted:#9aa3ae;
+  --border:#30353d; --accent:#7aa2ff; --accent-weak:#1f2a44;
+  --ok:#5fd28a; --ok-bg:#16301f; --bad:#ff8a80; --bad-bg:#3a1a18; --warn:#f5c35b; --warn-bg:#3a2e12;
+  --code-bg:#15181c; --code-text:#e6e8eb;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px 64px}
+header{padding:20px 0 8px}
+header h1{margin:0;font-size:1.45rem}
+header p{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.tabs{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;padding:10px 0;border-bottom:1px solid var(--border);overflow-x:auto}
+.tabs button{flex:0 0 auto;border:1px solid var(--border);background:var(--surface);color:var(--text);padding:8px 14px;border-radius:999px;font:inherit;font-size:.95rem;cursor:pointer}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+section.tab{display:none;padding-top:16px}
+section.tab.on{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:0 0 16px}
+.qhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+.qnum{font-weight:700}
+.chip{font-size:.75rem;padding:2px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.chip-o{background:var(--accent-weak);color:var(--accent);border-color:transparent}
+.chip-n{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.qtxt{margin:6px 0}
+.qask{margin:10px 0 6px;font-weight:600}
+pre{margin:0;font:13.5px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;white-space:pre;overflow-x:auto}
+pre.code{background:var(--code-bg);color:var(--code-text);border:1px solid var(--border);border-radius:8px;padding:12px;margin:8px 0}
+code{font:0.9em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--surface2);padding:1px 4px;border-radius:4px}
+ol.opts{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.opt{display:flex;gap:10px;border:1px solid var(--border);border-radius:8px;padding:10px;background:var(--surface)}
+.opt .letter{flex:0 0 26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);font-weight:700;font-size:.85rem}
+.optbody{min-width:0;flex:1}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.ok .letter{background:var(--ok);color:#fff}
+.opt.bad .why{color:var(--muted)}
+.opt.chosen-bad{border-color:var(--bad);background:var(--bad-bg)}
+.opt.chosen-bad .letter{background:var(--bad);color:#fff}
+.why{font-size:.88rem;margin-top:6px}
+.opt.ok .why{color:var(--ok)}
+.tag{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+.tag.mine{background:var(--accent);color:#fff}
+.exp{margin-top:12px;padding:12px;border-radius:8px;background:var(--surface2);font-size:.95rem}
+.exp strong:first-child{display:block;margin-bottom:4px}
+.exp ul,.exp ol{margin:6px 0;padding-left:20px}
+.hidden-sol .opt.ok{border-color:var(--border);background:var(--surface)}
+.hidden-sol .opt.ok .letter{background:var(--surface2);color:var(--text)}
+.hidden-sol .why,.hidden-sol .exp{display:none}
+.reveal{display:none;margin-top:10px}
+.hidden-sol .reveal{display:inline-block}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:14px}
+.toolbar label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+select,input[type=number]{font:inherit;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text)}
+.btn{font:inherit;border:1px solid var(--accent);background:var(--accent);color:#fff;padding:9px 16px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.danger{border-color:var(--bad);background:transparent;color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:default}
+.form{display:grid;gap:12px;max-width:520px}
+.form label{display:grid;gap:4px;font-size:.95rem}
+.form .row{display:flex;gap:8px;align-items:center}
+.note{font-size:.88rem;color:var(--muted)}
+.banner{border:1px solid var(--warn);background:var(--warn-bg);color:var(--text);border-radius:8px;padding:12px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.runbar{position:sticky;top:57px;z-index:4;background:var(--bg);display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;flex-wrap:wrap}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--surface2)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+label.ans{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;background:var(--surface)}
+label.ans:hover{border-color:var(--accent)}
+label.ans.sel{border-color:var(--accent);background:var(--accent-weak)}
+label.ans input{margin-top:4px;flex:0 0 auto}
+.navrow{display:flex;justify-content:space-between;gap:8px;margin:12px 0}
+.grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.grid button{width:38px;height:38px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-size:.85rem;cursor:pointer}
+.grid button.done{background:var(--surface2);border-color:var(--muted)}
+.grid button.cur{outline:2px solid var(--accent);outline-offset:1px}
+.grid button.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.grid button.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:10px 0 16px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px}
+.stat .v{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .l{font-size:.82rem;color:var(--muted)}
+.stat.ok .v{color:var(--ok)} .stat.bad .v{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600}
+.tablewrap{overflow-x:auto}
+.cab h2{font-size:1.1rem;margin:0 0 8px}
+.cab p,.cab li{font-size:.95rem}
+.cab ul{padding-left:20px;margin:6px 0}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.theme{flex:0 0 auto}
+.theme button{font:inherit;font-size:.85rem;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:6px;padding:4px 8px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+  <h1>Programação I · Treino offline</h1>
+  <p>Prova Escrita 2 — correção das 18 perguntas do teste de treino + 15 perguntas novas do mesmo estilo. Funciona sem internet.</p>
+  </div>
+  <div class="theme"><button id="themeBtn" type="button">Tema</button></div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="correcao" class="on">Correção</button>
+  <button data-tab="teste">Fazer teste</button>
+  <button data-tab="cabula">Cábula</button>
+  <button data-tab="historico">Histórico</button>
+</nav>
+
+<section class="tab on" id="tab-correcao">
+  <div class="toolbar">
+    <label>Mostrar
+      <select id="f-src">
+        <option value="orig">Teste de treino (18)</option>
+        <option value="novo">Perguntas novas (15)</option>
+        <option value="all">Todas (33)</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="f-hide"> Esconder soluções (modo estudo)</label>
+  </div>
+  <div id="corr-list"></div>
+</section>
+
+<section class="tab" id="tab-teste">
+  <div id="t-resume"></div>
+  <div id="t-setup" class="card">
+    <h2 style="margin-top:0;font-size:1.15rem">Configurar teste</h2>
+    <div class="form">
+      <label>Perguntas
+        <select id="t-pool">
+          <option value="orig">As 18 do teste de treino</option>
+          <option value="novo">As 15 perguntas novas</option>
+          <option value="mix">18 aleatórias (de todas)</option>
+          <option value="all">Todas (33)</option>
+        </select>
+      </label>
+      <label>Desconto por resposta errada
+        <select id="t-pen">
+          <option value="0">Sem desconto</option>
+          <option value="0.25" selected>−0,25 por errada</option>
+          <option value="0.3333">−1/3 por errada</option>
+          <option value="0.5">−0,5 por errada</option>
+        </select>
+        <span class="note">Não sei qual é o desconto que o teu professor aplica — ajusta aqui. “Não responder” vale sempre 0.</span>
+      </label>
+      <label>Tempo limite (minutos, 0 = sem limite)
+        <input type="number" id="t-mins" min="0" max="300" value="0">
+      </label>
+      <label class="row"><input type="checkbox" id="t-shufq" checked> Baralhar a ordem das perguntas</label>
+      <label class="row"><input type="checkbox" id="t-shufo" checked> Baralhar a ordem das opções</label>
+      <div><button class="btn" id="t-start" type="button">Começar teste</button></div>
+    </div>
+  </div>
+  <div id="t-run" hidden></div>
+  <div id="t-result" hidden></div>
+</section>
+
+<section class="tab cab" id="tab-cabula"></section>
+
+<section class="tab" id="tab-historico">
+  <div id="hist"></div>
+</section>
+</div>
+
+<script>
+"use strict";
+const C = String.raw;
+
+/* ============================================================
+   PERGUNTAS
+   ops: [texto, correta?, porquê]
+   ============================================================ */
+
+const DECL_IMOVEL = C`#define MAX_IMOVEIS 1000
+
+typedef struct{
+        /* Campos da estrutura */
+}tipoImovel;`;
+
+const DECL_IMOVEL_DATA = C`typedef struct{
+    int dia;
+    int mes;
+    int ano;
+}tipoData;
+
+typedef struct{
+    char designacao[50];
+    tipoData dataVenda;
+    float precoVenda;
+}tipoImovel;`;
+
+const OPTS_F = [
+  "vetor[1].x=-2  vetor[1].y=3.00",
+  "vetor[1].x=-2  vetor[4].y=4.50",
+  "vetor[1].x=0  vetor[3].y=0.00",
+  "vetor[1].x=-2  vetor[3].y=4.00"
+];
+
+const QS = [
+/* ---------------- 1 ---------------- */
+{ id:"O1", src:"orig", label:"Pergunta 1", tema:"Vetores e funções",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define MAX 5
+void funcao(int v[MAX], int n);
+
+int main(void){
+   int i, x, total;
+   int vetor[MAX]={4,5,6,0,1};
+
+   x = 2;
+   funcao(vetor,x);
+
+   total = 0;
+   for (i=0; i<MAX; i++){
+        total += vetor[i];
+   }
+   printf("\nmain()  total = %d", total);
+   return 0;
+}
+void funcao(int v[MAX], int n){
+    int j;
+
+    for (j=1; j<=n; j++){
+        v[j] = j-MAX;
+    }
+    printf("funcao() v[0]=%d  v[%d]=%d", v[0], j, v[j]);
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [C`funcao() v[0]=-5  v[3]=0
+main()  total = -11`, false, C`v[0] nunca é alterado: o ciclo começa em j=1.`],
+    [C`funcao() v[0]=4  v[3]=0
+main()  total = 16`, false, C`16 é a soma do vetor original. Mas os vetores são passados por referência, por isso as alterações feitas na função ficam no main.`],
+    [C`funcao() v[0]=4  v[3]=0
+main()  total = -2`, true, C`v[1]=-4, v[2]=-3; no fim do ciclo j=3; soma = 4-4-3+0+1 = -2.`],
+    [C`funcao() v[0]=4  v[2]=-3
+main()  total = -2`, false, C`Quando o ciclo <code>for</code> termina, j já vale 3 (é a condição <code>j&lt;=n</code> que falhou), logo imprime v[3].`]
+  ],
+  exp:C`<ol>
+<li>x=2 é passado para n. Ciclo <code>j=1..2</code>: <code>v[1]=1-5=-4</code>, <code>v[2]=2-5=-3</code>.</li>
+<li>O ciclo sai quando j=3. Imprime <code>v[0]=4</code> e <code>v[3]=0</code>.</li>
+<li>O vetor é alterado “de verdade” (passagem por referência): {4,-4,-3,0,1} → total = <b>-2</b>.</li>
+<li>Atenção ao <code>\n</code>: está no início do printf do main, por isso “main()” aparece na linha de baixo.</li></ol>`
+},
+/* ---------------- 2 ---------------- */
+{ id:"O2", src:"orig", label:"Pergunta 2", tema:"Vetores e funções",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+
+#define MAX 5
+#define TRES 3
+#define ZERO 0
+
+void funcao(int v[MAX]);
+
+int main(void){
+   int i, conta;
+   int vetor[MAX]={0};
+
+   funcao(vetor);
+   conta = 0;
+   for (i=0; i<MAX; i++){
+        if (vetor[i] % TRES == ZERO){
+           conta++;
+        }
+   }
+   printf("conta = %d", conta);
+
+   return 0;
+}
+
+void funcao(int v[MAX]){
+    int j;
+
+    for (j=0; j<MAX; j++){
+        v[j] = j+TRES;
+    }
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    ["conta = 2", true, C`O vetor fica {3,4,5,6,7}; múltiplos de 3: 3 e 6.`],
+    ["conta = 0", false, C`Isto seria se a função não alterasse o vetor — mas altera (vetores passam por referência).`],
+    ["conta = 5", false, C`Seria se o vetor continuasse todo a 0 (0 % 3 == 0). Mas a função preenche-o.`],
+    ["conta = 3", false, C`Só 3 e 6 são divisíveis por 3.`]
+  ],
+  exp:C`A função coloca <code>v[j]=j+3</code> → {3,4,5,6,7}. O main conta quantos têm resto 0 na divisão por 3: <b>3 e 6</b> → <code>conta = 2</code>.`
+},
+/* ---------------- 3 ---------------- */
+{ id:"O3", src:"orig", label:"Pergunta 3", tema:"Strings",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#include <string.h>
+
+#define MAX 10
+#define TEXTO "teste"
+#define CONST 7
+
+void funcao(char v[MAX]);
+
+int main(void){
+   int i, conta;
+   char vetor[MAX]={'\0'};
+
+   funcao(vetor);
+   conta = 0;
+   for (i=0; i<=CONST; i++){
+        if (vetor[i] != '\0'){
+           conta++;
+        }
+   }
+   printf("conta = %d", conta);
+
+   return 0;
+}
+void funcao(char v[MAX]){
+   strcpy(v,TEXTO);
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    ["conta = 0", false, C`O strcpy altera o vetor do main (é um vetor → passa por referência).`],
+    ["conta = 10", false, C`Só as posições com letras são diferentes de '\0'.`],
+    ["conta = 3", false, C`"teste" tem 5 letras.`],
+    ["conta = 5", true, C`Posições 0–4 têm 't','e','s','t','e'; as restantes são '\0'.`]
+  ],
+  exp:C`O vetor começa todo a <code>'\0'</code>. O <code>strcpy</code> escreve "teste" nas posições 0–4 (e '\0' na 5). O ciclo vê as posições 0 a 7 (<code>i&lt;=7</code>) e conta as diferentes de '\0' → <b>5</b>.`
+},
+/* ---------------- 4 ---------------- */
+{ id:"O4", src:"orig", label:"Pergunta 4", tema:"Estruturas e ponteiros",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define MAX 16
+#define TRES 3
+#define NUMDECIMAL 0.425
+#define QUATRO 4
+typedef struct{
+    int x;
+    float y;
+} tipoNumeros;
+void g(tipoNumeros *a);
+int main(void){
+    tipoNumeros dados;
+
+    dados.x = QUATRO;
+    dados.y = NUMDECIMAL;
+    g(&dados);
+    printf(" main() x=%d  y=%.2f \n",  dados.x, dados.y);
+    return 0;
+}
+void g(tipoNumeros *a){
+    printf(" g() x=%d  y=%.2f \n",  a->x, a->y);
+    a->x = MAX % TRES;
+    a->y = MAX / TRES;
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [C`g() x=4  y=0.42
+main()  x=1  y=5.33`, false, C`16/3 entre inteiros dá 5 (não 5.33). E 0.425 aparece arredondado para 0.43.`],
+    [C`g() x=4  y=0.43
+main()  x=4  y=0.43`, false, C`A função recebe o endereço (&dados), por isso as alterações ficam no main.`],
+    [C`g() x=4  y=0.425
+main()  x=1  y=5.33`, false, C`<code>%.2f</code> mostra sempre 2 casas decimais; e 16/3 é divisão inteira.`],
+    [C`g() x=4  y=0.43
+main()  x=1  y=5.00`, true, C`16%3=1; 16/3=5 (inteiros) guardado num float → 5.00.`]
+  ],
+  exp:C`<ol>
+<li>O printf de g() é feito <b>antes</b> das alterações: x=4, y=0.425 → com <code>%.2f</code> fica <b>0.43</b> (o float guarda 0.42500001…, que arredonda para cima).</li>
+<li><code>MAX % TRES</code> = 16 % 3 = <b>1</b>.</li>
+<li><code>MAX / TRES</code> = 16 / 3 — <b>os dois são int</b>, logo divisão inteira = 5. Só depois é guardado no float → <b>5.00</b>.</li>
+<li>Como g recebe um ponteiro, as alterações ficam no main.</li></ol>`
+},
+/* ---------------- 5 ---------------- */
+{ id:"O5", src:"orig", label:"Pergunta 5", tema:"Estruturas por valor",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define VALOR 9.10
+#define VIAGENS 10
+typedef struct{
+    int dias;
+    float portagem;
+} tipoTeste;
+void g(tipoTeste a);
+int main(void){
+    tipoTeste dados;
+
+    dados.dias = 2;
+    dados.portagem = VALOR;
+    g(dados);
+    printf(" main() dias=%d  portagem=%.2f \n",  dados.dias, dados.portagem);
+
+    return 0;
+}
+void g(tipoTeste a){
+    a.dias = VIAGENS;
+    a.portagem = VALOR*VIAGENS;
+    printf(" g() dias=%d  portagem=%.2f \n",  a.dias, a.portagem);
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [C`g() dias=10  portagem=91.0
+main() dias=2  portagem=9.1`, false, C`<code>%.2f</code> mostra sempre 2 casas decimais: 91.00 e 9.10.`],
+    [C`g() dias=10  portagem=91.00
+main() dias=10  portagem=91.00`, false, C`A struct é passada por valor (cópia). O main não vê as alterações.`],
+    [C`g() dias=10  portagem=91.00
+main() dias=2  portagem=9.10`, true, C`g() mostra a cópia alterada; o main mantém os valores originais.`],
+    [C`main() dias=2  portagem=9.10
+g() dias=10  portagem=91.00`, false, C`A ordem está trocada: g() é chamada antes do printf do main.`]
+  ],
+  exp:C`<code>g(dados)</code> recebe uma <b>cópia</b> da struct (sem <code>*</code> nem <code>&amp;</code>). g() imprime primeiro (10 e 9.10×10=91.00); depois o main imprime os valores originais (2 e 9.10).`
+},
+/* ---------------- 6 ---------------- */
+{ id:"O6", src:"orig", label:"Pergunta 6", tema:"Vetor de structs + ponteiro",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define MAX 5
+#define TRES 3
+#define UM 1
+#define MEIO 0.5
+
+typedef struct{
+    int x;
+    float y;
+} tipoTeste;
+
+void f(tipoTeste v[MAX], int *c);
+
+int main(void){
+    int k;
+    tipoTeste vetor[MAX]= {0};
+
+    k = TRES;
+    f(vetor, &k);
+    printf("vetor[%d].x=%d  vetor[%d].y=%.2f", UM, vetor[UM].x, k, vetor[k].y);
+    return 0;
+}
+void f(tipoTeste v[MAX], int *c){
+    int i;
+
+    for (i=0; i<MAX; i++){
+        v[i].x = i - (*c);
+        v[i].y = (i+MAX) * MEIO;
+    }
+    (*c)++;
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [OPTS_F[0], false, C`k não fica 1. Fica 4 (era 3 e foi incrementado através do ponteiro).`],
+    [OPTS_F[1], true, C`k passa a 4 (por ponteiro); vetor[4].y=(4+5)*0.5=4.50.`],
+    [OPTS_F[2], false, C`O vetor é alterado pela função; não fica a zeros.`],
+    [OPTS_F[3], false, C`Isto seria se k continuasse 3 — mas <code>(*c)++</code> altera o k do main.`]
+  ],
+  exp:C`Durante o ciclo <code>*c</code>=3: <code>v[1].x = 1-3 = -2</code>. Depois <code>(*c)++</code> → <b>k = 4</b> no main (porque se passou <code>&amp;k</code>). <code>vetor[4].y = (4+5)*0.5 = 4.50</code>.`
+},
+/* ---------------- 7 ---------------- */
+{ id:"O7", src:"orig", label:"Pergunta 7", tema:"Vetor de structs + valor",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define MAX 5
+#define TRES 3
+#define UM 1
+#define MEIO 0.5
+
+typedef struct{
+    int x;
+    float y;
+} tipoTeste;
+
+void f(tipoTeste v[MAX], int c);
+
+int main(void){
+    int k;
+    tipoTeste vetor[MAX]= {0};
+
+    k = TRES;
+    f(vetor, k);
+    printf("vetor[%d].x=%d  vetor[%d].y=%.2f", UM, vetor[UM].x, k, vetor[k].y);
+    return 0;
+}
+void f(tipoTeste v[MAX], int c){
+    int i;
+
+    for (i=0; i<MAX; i++){
+        v[i].x = i-c;
+        v[i].y = (i+MAX) * MEIO;
+    }
+    c++;
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [OPTS_F[3], true, C`k é passado por valor → continua 3; vetor[3].y=(3+5)*0.5=4.00.`],
+    [OPTS_F[1], false, C`<code>c++</code> só altera a cópia local; o k do main continua 3.`],
+    [OPTS_F[0], false, C`k vale 3, não 1.`],
+    [OPTS_F[2], false, C`O vetor é alterado (vetores passam sempre por referência).`]
+  ],
+  exp:C`Mesmo programa da pergunta 6, mas <code>c</code> é um <b>int normal</b> (cópia). O vetor é alterado, mas <code>c++</code> não mexe no k do main → <b>k = 3</b>. <code>vetor[1].x=-2</code>, <code>vetor[3].y=(3+5)*0.5=4.00</code>.`
+},
+/* ---------------- 8 ---------------- */
+{ id:"O8", src:"orig", label:"Pergunta 8", tema:"Vetor de structs + return",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define MAX 5
+#define TRES 3
+#define UM 1
+#define MEIO 0.5
+
+typedef struct{
+    int x;
+    float y;
+} tipoTeste;
+
+int f(tipoTeste v[MAX], int c);
+
+int main(void){
+    int k;
+    tipoTeste vetor[MAX]= {0};
+
+    k = TRES;
+    k = f(vetor, k);
+    printf("vetor[%d].x=%d  vetor[%d].y=%.2f", UM, vetor[UM].x, k, vetor[k].y);
+    return 0;
+}
+int f(tipoTeste v[MAX], int c){
+    int i;
+
+    for (i=0; i<MAX; i++){
+        v[i].x = i - c;
+        v[i].y = (i+MAX) * MEIO;
+    }
+    c++;
+    return c;
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [OPTS_F[0], false, C`k fica 4, não 1.`],
+    [OPTS_F[1], true, C`A função devolve 4 e o main guarda-o em k (<code>k = f(...)</code>).`],
+    [OPTS_F[2], false, C`O vetor é alterado pela função.`],
+    [OPTS_F[3], false, C`Seria assim se o main fizesse só <code>f(vetor,k);</code> sem guardar o return.`]
+  ],
+  exp:C`Agora a função <b>devolve</b> c+1 = 4 e o main faz <code>k = f(vetor, k);</code> → k = 4. Resultado igual ao da pergunta 6: <code>vetor[1].x=-2  vetor[4].y=4.50</code>.<br>Resumo 6/7/8: ponteiro → muda; valor → não muda; return guardado → muda.`
+},
+/* ---------------- 9 ---------------- */
+{ id:"O9", src:"orig", label:"Pergunta 9", tema:"Funções com structs",
+  txt:C`A função <b>mostraInfoUtente()</b> recebe, e lista no monitor, a informação referente a um utente de um centro de saúde. Considerando as seguintes declarações:`,
+  code:C`typedef struct{
+    int dia;
+    int mes;
+    int ano;
+}tipoData;
+
+typedef struct{
+    int codigo;
+    char nome[50];
+    tipoData dataNascimento;
+}tipoUtente;
+
+void mostraData (tipoData data);  /* apresenta no monitor uma data */`,
+  ask:C`Assumindo que a função mostraData() se encontra implementada, indique a codificação mais correta para a função <b>mostraInfoUtente()</b>.`,
+  ops:[
+    [C`void mostraInfoUtente(tipoUtente dados){
+    printf("\nCodigo: %d", dados.codigo);
+    printf("\nNome: %s", dados.nome);
+    mostraData(dados.dataNascimento);
+}`, true, C`Recebe a struct (só para mostrar, basta cópia) e usa o ponto.`],
+    [C`tipoUtente mostraInfoUtente(void){
+    tipoUtente dados;
+    printf("\nCodigo: %d", dados.codigo);
+    printf("\nNome: %s", dados.nome);
+    mostraData(dados.dataNascimento);
+    return dados;
+}`, false, C`Não recebe nada: mostraria lixo de uma variável local não inicializada.`],
+    [C`void mostraInfoUtente(tipoUtente dados){
+    printf("\nCodigo: %d", dados[0].codigo);
+    printf("\nNome: %s", dados[0].nome);
+    mostraData(dados[0].dataNascimento);
+}`, false, C`dados é uma struct, não um vetor — <code>dados[0]</code> é erro.`],
+    [C`void mostraInfoUtente(tipoUtente dados){
+    printf("\nCodigo: %d", dados->codigo);
+    printf("\nNome: %s", dados->nome);
+    mostraData(dados->dataNascimento);
+}`, false, C`<code>-&gt;</code> só se usa com ponteiros; aqui dados não é ponteiro.`]
+  ],
+  exp:C`A função “recebe” o utente → parâmetro <code>tipoUtente dados</code>. Como só mostra (não altera), a passagem por valor chega. Com variável normal usa-se <code>.</code>; com ponteiro usa-se <code>-&gt;</code>.`
+},
+/* ---------------- 10 ---------------- */
+{ id:"O10", src:"orig", label:"Pergunta 10", tema:"Funções de leitura",
+  txt:C`A função <b>obtemImovel()</b> obtém, e devolve, a informação referente a um imóvel vendido por uma agência imobiliária. Considerando as seguintes declarações:`,
+  code:DECL_IMOVEL_DATA + C`
+
+float lerFloat (float min, float max);
+void lerString (char vetor[], int max);
+tipoData lerData (void);   /* obtém e devolve uma data */`,
+  ask:C`Assumindo que as funções lerFloat(), lerString() e lerData() se encontram implementadas, indique a codificação mais correta para a função <b>obtemImovel()</b>.`,
+  ops:[
+    [C`tipoImovel obtemImovel(){
+    tipoImovel dados;
+
+    lerString(dados.designacao,50);
+    lerData(&dados.dataVenda);
+    dados.precoVenda=lerFloat(0,9999.99);
+
+    return dados;
+}`, false, C`Aqui <code>lerData</code> é <code>tipoData lerData(void)</code>: não recebe nada, devolve a data. Deve ser <code>dados.dataVenda = lerData();</code>.`],
+    [C`void obtemImovel(tipoImovel dados){
+    lerString(dados.designacao,50);
+    dados.dataVenda=lerData();
+    dados.precoVenda=lerFloat(0,9999.99);
+}`, false, C`Passagem por valor: preenche uma cópia que se perde no fim da função.`],
+    [C`void obtemImovel(tipoImovel *dados){
+    lerString(dados.designacao,50);
+    dados.dataVenda=lerData();
+    dados.precoVenda=lerFloat(0,9999.99);
+}`, false, C`dados é ponteiro → tem de ser <code>dados-&gt;campo</code>, não <code>dados.campo</code> (erro de compilação).`],
+    [C`void obtemImovel(tipoImovel *dados){
+    lerString(dados->designacao,50);
+    dados->dataVenda=lerData();
+    dados->precoVenda=lerFloat(0,9999.99);
+}`, true, C`Recebe o endereço, usa <code>-&gt;</code> e lerData() devolve a data (atribuição).`]
+  ],
+  exp:C`Chave: <b>olhar para o protótipo de lerData</b>. Aqui é <code>tipoData lerData(void)</code> → usa-se <code>x = lerData();</code>. A única opção que usa isso e “devolve” corretamente (por ponteiro, com <code>-&gt;</code>) é a última.`
+},
+/* ---------------- 11 ---------------- */
+{ id:"O11", src:"orig", label:"Pergunta 11", tema:"Funções de leitura",
+  txt:C`A função <b>obtemImovel()</b> obtém, e devolve, a informação referente a um imóvel vendido por uma agência imobiliária. Considerando as seguintes declarações:`,
+  code:DECL_IMOVEL_DATA + C`
+
+float lerFloat (float min, float max);
+void lerString (char vetor[], int max);
+void lerData (tipoData *data);   /* obtém e devolve uma data */`,
+  ask:C`Assumindo que as funções lerFloat(), lerString() e lerData() se encontram implementadas, indique a codificação mais correta para a função <b>obtemImovel()</b>.`,
+  ops:[
+    [C`void obtemImovel(tipoImovel dados){
+    lerString(dados.designacao,50);
+    lerData(&dados.dataVenda);
+    dados.precoVenda=lerFloat(0,9999.99);
+}`, false, C`Passagem por valor: os dados lidos perdem-se.`],
+    [C`tipoImovel obtemImovel(){
+    tipoImovel dados;
+
+    lerString(dados.designacao,50);
+    lerData(&dados.dataVenda);
+    dados.precoVenda=lerFloat(0,9999.99);
+
+    return dados;
+}`, true, C`Variável local preenchida e devolvida com return. lerData recebe o endereço da data.`],
+    [C`void obtemImovel(tipoImovel *dados){
+    lerString(dados.designacao,50);
+    lerData(&dados.dataVenda);
+    dados.precoVenda=lerFloat(0,9999.99);
+}`, false, C`dados é ponteiro → seria <code>dados-&gt;campo</code>.`],
+    [C`void obtemImovel(tipoImovel *dados){
+    lerString(dados->designacao,50);
+    dados->dataVenda=lerData();
+    dados->precoVenda=lerFloat(0,9999.99);
+}`, false, C`Aqui lerData é <code>void lerData(tipoData *data)</code>: não devolve nada, não se pode atribuir. Seria <code>lerData(&amp;dados-&gt;dataVenda);</code>.`]
+  ],
+  exp:C`É a “gémea” da pergunta 10 com o protótipo de lerData trocado: agora <code>void lerData(tipoData *data)</code> → chama-se com o <b>endereço</b>: <code>lerData(&amp;dados.dataVenda)</code>. A única opção correta é a que devolve a struct com <code>return</code>.`
+},
+/* ---------------- 12 ---------------- */
+{ id:"O12", src:"orig", label:"Pergunta 12", tema:"Declaração de estruturas",
+  txt:C`Pretende-se definir uma estrutura de dados para armazenar a informação referente às entregas de take-away de um restaurante num determinado ano. Para cada entrega pretende-se armazenar: código, designação, data de entrega, preço, distância. Considera-se que o restaurante faz no máximo 500 entregas por ano.<br><span class="note">(Na foto as opções 3 e 4 estavam cortadas — reconstruí-as no mesmo estilo.)</span>`,
+  code:"",
+  ask:"Indique as declarações mais corretas para a definição da estrutura de dados.",
+  ops:[
+    [C`typedef struct{ int dia; int mes; int ano; }tipoData;
+
+typedef struct{
+    int codigo;
+    char designacao[100];
+    tipoData dataEntrega;
+    float preco;
+    float distancia;
+}tipoEntregas;
+
+int main(void){
+    tipoEntregas vetor=0;
+    int quantEntregas=500;
+    ...`, false, C`<code>vetor</code> não é vetor (só guarda 1 entrega) e o contador deve começar em 0.`],
+    [C`typedef struct{ int dia; int mes; int ano; }tipoData;
+
+typedef struct{
+    int codigo;
+    char designacao[100];
+    tipoData dataEntrega;
+    float preco;
+    float distancia;
+}tipoEntregas;
+
+int main(void){
+    tipoEntregas vetor[500];
+    int quantEntregas=0;
+    ...`, true, C`Vetor com capacidade 500 e contador de entregas registadas a começar em 0.`],
+    [C`typedef struct{ int dia; int mes[12]; int ano; }tipoData;
+
+typedef struct{
+    int codigo;
+    char designacao[100];
+    tipoData dataEntrega;
+    float preco;
+    float distancia;
+}tipoEntregas;
+
+int main(void){
+    tipoEntregas vetor[500];
+    int quantEntregas=0;
+    ...`, false, C`Uma data tem <b>um</b> mês, não 12: <code>int mes[12]</code> não faz sentido.`],
+    [C`typedef struct{ int dia; int mes; int ano; }tipoData;
+
+typedef struct{
+    int codigo;
+    char designacao;
+    tipoData dataEntrega;
+    float preco;
+    float distancia;
+}tipoEntregas;
+
+int main(void){
+    tipoEntregas vetor[500];
+    int quantEntregas=0;
+    ...`, false, C`<code>char designacao;</code> guarda só 1 carácter — uma designação é uma string (<code>char designacao[100]</code>).`]
+  ],
+  exp:C`Regras: data como struct própria (<code>tipoData</code>), strings como <code>char x[N]</code>, um <b>vetor</b> com o máximo (500) e um <b>contador</b> que começa a 0 (ainda não há entregas).`
+},
+/* ---------------- 13 ---------------- */
+{ id:"O13", src:"orig", label:"Pergunta 13", tema:"Ciclos com vetor de structs",
+  txt:"Considere que se pretende listar no monitor a informação referente aos imóveis vendidos por uma agência imobiliária. Considere que foram efetuadas as seguintes declarações:",
+  code:DECL_IMOVEL + C`
+
+void mostraImovel(tipoImovel dados);  /* apresenta os dados de UM imóvel */
+
+int main(void){
+    tipoImovel vetor[MAX_IMOVEIS];
+    int i, quantImoveis=0;
+
+    /* Codigo para atualizar dados dos imoveis */
+
+    /* Codigo para listar dados dos imoveis */
+
+    return 0;
+}`,
+  ask:"Considerando que a função mostraImovel() se encontra implementada, indique qual o bloco de código que acrescentaria para listar os dados de todos os imóveis vendidos.",
+  ops:[
+    [C`mostraImovel(vetor, quantImoveis);`, false, C`mostraImovel recebe <b>um</b> tipoImovel, não o vetor e a quantidade.`],
+    [C`mostraImovel(vetor);`, false, C`Passa o vetor inteiro a uma função que espera um único imóvel.`],
+    [C`for (i=0; i<quantImoveis; i++){
+    mostraImovel(vetor[i]);
+}`, true, C`Percorre só os imóveis registados e passa um de cada vez.`],
+    [C`for (i=0; i<quantImoveis; i++){
+    vetor[i] = mostraImovel();
+}`, false, C`mostraImovel é void e precisa de argumento — isto não compila.`]
+  ],
+  exp:C`A função trata <b>um</b> imóvel → precisa de um ciclo até <code>quantImoveis</code> (não até MAX) passando <code>vetor[i]</code> (por valor, porque o protótipo é <code>tipoImovel dados</code>).`
+},
+/* ---------------- 14 ---------------- */
+{ id:"O14", src:"orig", label:"Pergunta 14", tema:"Ciclos com vetor de structs",
+  txt:"Considere que se pretende obter a informação referente aos imóveis vendidos no último ano por uma agência imobiliária. Considere que foram efetuadas as seguintes declarações:",
+  code:DECL_IMOVEL + C`
+
+int lerInteiro(int minimo, int maximo); /* devolve inteiro entre minimo e maximo */
+tipoImovel obtemImovel(void);           /* obtém e devolve os dados de um imóvel */
+
+int main(void){
+    tipoImovel vetor[MAX_IMOVEIS];
+    int i, quantImoveis=0;
+
+    /* Código para obter dados dos imóveis */
+
+    return 0;
+}`,
+  ask:"Considerando que lerInteiro() e obtemImovel() se encontram implementadas, indique qual o bloco de código que acrescentaria para obter os dados dos imóveis vendidos no último ano.",
+  ops:[
+    [C`for (i=0; i<MAX_IMOVEIS; i++){
+    vetor[i]=obtemImovel();
+}`, false, C`Obrigaria a introduzir 1000 imóveis e quantImoveis ficaria 0.`],
+    [C`quantImoveis=lerInteiro(1,MAX_IMOVEIS);
+for (i=0; i<quantImoveis; i++){
+    obtemImovel(&vetor[i]);
+}`, false, C`obtemImovel é <code>(void)</code> — não recebe argumentos; devolve o imóvel.`],
+    [C`quantImoveis=lerInteiro(1,MAX_IMOVEIS);
+for (i=0; i<quantImoveis; i++){
+    vetor[i]=obtemImovel();
+}`, true, C`Lê quantos são e guarda o valor devolvido em cada posição.`],
+    [C`quantImoveis=lerInteiro(1,MAX_IMOVEIS);
+obtemImovel(vetor, quantImoveis);`, false, C`obtemImovel não recebe o vetor nem a quantidade.`]
+  ],
+  exp:C`Protótipo <code>tipoImovel obtemImovel(void)</code> → a função <b>devolve</b> → usa-se <code>vetor[i] = obtemImovel();</code>. Primeiro pergunta-se quantos imóveis há (lerInteiro) e o ciclo vai até esse número.`
+},
+/* ---------------- 15 ---------------- */
+{ id:"O15", src:"orig", label:"Pergunta 15", tema:"Ciclos com vetor de structs",
+  txt:"Considere que se pretende obter a informação referente aos imóveis vendidos no último ano por uma agência imobiliária. Considere que foram efetuadas as seguintes declarações:",
+  code:DECL_IMOVEL + C`
+
+int lerInteiro(int minimo, int maximo); /* devolve inteiro entre minimo e maximo */
+void obtemImovel(tipoImovel *dados);    /* obtém e devolve os dados de um imóvel */
+
+int main(void){
+    tipoImovel vetor[MAX_IMOVEIS];
+    int i, quantImoveis=0;
+
+    /* Código para obter dados dos imóveis */
+
+    return 0;
+}`,
+  ask:"Considerando que lerInteiro() e obtemImovel() se encontram implementadas, indique qual o bloco de código que acrescentaria para obter os dados dos imóveis vendidos no último ano.",
+  ops:[
+    [C`quantImoveis=lerInteiro(1,MAX_IMOVEIS);
+for (i=0; i<quantImoveis; i++){
+    obtemImovel(&vetor[i]);
+}`, true, C`A função recebe um ponteiro → passa-se o endereço de cada posição.`],
+    [C`quantImoveis=lerInteiro(1,MAX_IMOVEIS);
+obtemImovel(vetor, quantImoveis);`, false, C`A função só recebe um ponteiro para um imóvel.`],
+    [C`for (i=0; i<MAX_IMOVEIS; i++){
+    obtemImovel(&vetor[i]);
+}`, false, C`Não lê a quantidade: pediria 1000 imóveis e quantImoveis ficaria 0.`],
+    [C`quantImoveis=lerInteiro(1,MAX_IMOVEIS);
+for (i=0; i<quantImoveis; i++){
+    vetor[i]=obtemImovel();
+}`, false, C`obtemImovel é void e precisa de argumento.`]
+  ],
+  exp:C`É a gémea da 14: agora o protótipo é <code>void obtemImovel(tipoImovel *dados)</code> → passa-se o <b>endereço</b>: <code>obtemImovel(&amp;vetor[i]);</code>.`
+},
+/* ---------------- 16 ---------------- */
+{ id:"O16", src:"orig", label:"Pergunta 16", tema:"Ficheiros binários",
+  txt:C`A função <b>gravaFicheiroBinario()</b> armazena no ficheiro binário IMOVEIS.DAT a informação referente aos imóveis vendidos por uma agência imobiliária. Considerando as seguintes declarações:`,
+  code:DECL_IMOVEL,
+  ask:C`Indique a codificação mais correta para a função <b>gravaFicheiroBinario()</b>`,
+  ops:[
+    [C`void gravaFicheiroBinario (tipoImovel vetor[MAX_IMOVEIS], int quantImoveis){
+    FILE *fp;
+
+    fp = fopen("IMOVEIS.DAT", "wb");
+    if (fp != NULL) {
+        fwrite(quantImoveis, sizeof(int), 1, fp);
+        fwrite(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`fwrite precisa do <b>endereço</b>: <code>&amp;quantImoveis</code>.`],
+    [C`void gravaFicheiroBinario (tipoImovel vetor[MAX_IMOVEIS], int quantImoveis){
+    FILE *fp;
+
+    fp = fopen("IMOVEIS.DAT", "wb");
+    if (fp != NULL) {
+        fwrite(&quantImoveis, sizeof(int), 1, fp);
+        fwrite(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, true, C`"wb", verifica != NULL, grava a quantidade (com &amp;) e depois o vetor (sem &amp;).`],
+    [C`void gravaFicheiroBinario (tipoImovel vetor[MAX_IMOVEIS], int quantImoveis){
+    FILE *fp;
+
+    fp = fopen("IMOVEIS.DAT", "w");
+    if (fp != NULL) {
+        fwrite(&quantImoveis, sizeof(int), 1, fp);
+        fwrite(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`"w" é modo <b>texto</b>; ficheiro binário usa "wb".`],
+    [C`void gravaFicheiroBinario (tipoImovel vetor[MAX_IMOVEIS], int quantImoveis){
+    FILE *fp;
+
+    fp = fopen("IMOVEIS.DAT", "wb");
+    if (fp == NULL) {
+        fwrite(&quantImoveis, sizeof(int), 1, fp);
+        fwrite(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`Condição invertida: só escreveria quando o ficheiro <b>não</b> abriu (crash).`]
+  ],
+  exp:C`Checklist de gravar binário: <code>fopen(…, "wb")</code> → <code>if (fp != NULL)</code> → <code>fwrite(&amp;quant, sizeof(int), 1, fp)</code> → <code>fwrite(vetor, sizeof(tipo), quant, fp)</code> → <code>fclose(fp)</code>. O vetor já é um endereço, por isso não leva &amp;.`
+},
+/* ---------------- 17 ---------------- */
+{ id:"O17", src:"orig", label:"Pergunta 17", tema:"Ficheiros binários",
+  txt:C`A função <b>leFicheiroBinario()</b> obtém do ficheiro binário IMOVEIS.DAT e devolve a informação referente aos imóveis vendidos no último ano por uma agência imobiliária. Considerando as seguintes declarações:`,
+  code:DECL_IMOVEL,
+  ask:C`Indique a codificação mais correta para a função <b>leFicheiroBinario()</b>`,
+  ops:[
+    [C`void leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int *quantImoveis){
+    FILE *fp;
+    quantImoveis=0;
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp != NULL) {
+        fread(&quantImoveis, sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`<code>quantImoveis=0</code> estraga o ponteiro (fica NULL); <code>&amp;quantImoveis</code> é o endereço do ponteiro; e a quantidade passada ao fread é um ponteiro.`],
+    [C`int leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS]){
+    FILE *fp;
+    int quantImoveis=0;
+
+    fp = fopen("IMOVEIS.DAT", "r");
+    if (fp != NULL) {
+        fread(&quantImoveis, sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+    return quantImoveis;
+}`, false, C`"r" é modo texto; para binário é "rb".`],
+    [C`void leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int *quantImoveis){
+    FILE *fp;
+    *quantImoveis=0;
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp != NULL) {
+        fread(&(*quantImoveis), sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), *quantImoveis, fp);
+        fclose(fp);
+    }
+}`, true, C`<code>*quantImoveis=0</code> mexe no valor; <code>&amp;(*quantImoveis)</code> é o próprio ponteiro; a quantidade é <code>*quantImoveis</code>.`],
+    [C`void leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int *quantImoveis){
+    FILE *fp;
+    *quantImoveis=0;
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp == NULL) {
+        fread(&(*quantImoveis), sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), *quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`Condição invertida (<code>== NULL</code>).`]
+  ],
+  exp:C`A quantidade é “devolvida” por ponteiro (<code>int *quantImoveis</code>). Dentro da função: o valor é <code>*quantImoveis</code> e o endereço é <code>quantImoveis</code> (= <code>&amp;(*quantImoveis)</code>). Leitura na mesma ordem da gravação: primeiro o int, depois o vetor.`
+},
+/* ---------------- 18 ---------------- */
+{ id:"O18", src:"orig", label:"Pergunta 18", tema:"Ficheiros binários",
+  txt:C`A função <b>leFicheiroBinario()</b> obtém do ficheiro binário IMOVEIS.DAT e devolve a informação referente aos imóveis vendidos no último ano por uma agência imobiliária. Considerando as seguintes declarações:`,
+  code:DECL_IMOVEL,
+  ask:C`Indique a codificação mais correta para a função <b>leFicheiroBinario()</b>`,
+  ops:[
+    [C`void leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS]){
+    FILE *fp;
+    int quantImoveis=0;
+
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp != NULL) {
+        fread(&quantImoveis, sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`Lê bem mas a quantidade fica numa variável local — perde-se (função void sem return).`],
+    [C`int leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS]){
+    FILE *fp;
+    int quantImoveis=0;
+
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp != NULL) {
+        fread(&quantImoveis, sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+    return quantImoveis;
+}`, true, C`"rb", != NULL, lê quantidade e vetor e devolve a quantidade com return.`],
+    [C`void leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int *quantImoveis){
+    FILE *fp;
+    *quantImoveis=0;
+    fp = fopen("IMOVEIS.DAT", "r");
+    if (fp != NULL) {
+        fread(&(*quantImoveis), sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), *quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`Tudo certo exceto o modo: "r" é texto; tem de ser "rb".`],
+    [C`int leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS]){
+    FILE *fp;
+    int quantImoveis=0;
+
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp == NULL) {
+        fread(&quantImoveis, sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+    return quantImoveis;
+}`, false, C`Condição invertida (<code>== NULL</code>).`]
+  ],
+  exp:C`Aqui a quantidade é devolvida com <b>return</b> (função <code>int</code>). Elimina pelos detalhes: modo "rb" (não "r"), <code>!= NULL</code> (não ==), e tem de devolver a quantidade de alguma forma.`
+},
+
+/* ================== PERGUNTAS NOVAS ================== */
+{ id:"N1", src:"novo", label:"Extra 1", tema:"Vetores e funções",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define MAX 6
+void funcao(int v[MAX], int n);
+
+int main(void){
+   int i, x, total;
+   int vetor[MAX]={2,7,1,0,3,5};
+
+   x = 3;
+   funcao(vetor,x);
+
+   total = 0;
+   for (i=0; i<MAX; i++){
+        total += vetor[i];
+   }
+   printf("\nmain()  total = %d", total);
+   return 0;
+}
+void funcao(int v[MAX], int n){
+    int j;
+
+    for (j=n; j<MAX; j++){
+        v[j] = v[j-1] + j;
+    }
+    printf("funcao() v[%d]=%d  n=%d", j-1, v[j-1], n);
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [C`funcao() v[5]=13  n=3
+main()  total = 35`, true, C`v[3]=4, v[4]=8, v[5]=13; soma 2+7+1+4+8+13=35.`],
+    [C`funcao() v[5]=13  n=6
+main()  total = 35`, false, C`É o j que chega a 6; n nunca é alterado (vale 3).`],
+    [C`funcao() v[5]=5  n=3
+main()  total = 18`, false, C`18 é a soma original — mas o vetor é alterado na função.`],
+    [C`funcao() v[6]=13  n=3
+main()  total = 35`, false, C`Imprime o índice <code>j-1</code> = 5, não 6.`]
+  ],
+  exp:C`Ciclo de j=3 a 5, cada posição depende da anterior: <code>v[3]=v[2]+3=1+3=4</code>, <code>v[4]=4+4=8</code>, <code>v[5]=8+5=13</code>. No fim j=6 → imprime <code>v[5]=13</code>. Vetor final {2,7,1,4,8,13} → total 35.`
+},
+{ id:"N2", src:"novo", label:"Extra 2", tema:"Vetores e funções",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+
+#define MAX 6
+#define DOIS 2
+
+void funcao(int v[MAX]);
+
+int main(void){
+   int i, conta;
+   int vetor[MAX]={0};
+
+   funcao(vetor);
+   conta = 0;
+   for (i=0; i<MAX; i++){
+        if (vetor[i] % DOIS != 0){
+           conta++;
+        }
+   }
+   printf("conta = %d", conta);
+   return 0;
+}
+
+void funcao(int v[MAX]){
+    int j;
+    for (j=0; j<MAX; j++){
+        v[j] = j*j;
+    }
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    ["conta = 3", true, C`{0,1,4,9,16,25}: ímpares 1, 9, 25.`],
+    ["conta = 2", false, C`Conta outra vez: 1, 9 e 25 são ímpares.`],
+    ["conta = 6", false, C`Nem todos são ímpares.`],
+    ["conta = 0", false, C`Seria se o vetor ficasse a zeros — mas a função preenche-o.`]
+  ],
+  exp:C`v[j]=j² → {0,1,4,9,16,25}. A condição <code>% 2 != 0</code> conta os <b>ímpares</b>: 1, 9, 25 → <b>3</b>.`
+},
+{ id:"N3", src:"novo", label:"Extra 3", tema:"Strings",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#include <string.h>
+
+#define MAX 12
+#define TEXTO "prog1"
+
+void funcao(char v[MAX]);
+
+int main(void){
+   int i, conta;
+   char vetor[MAX]={'\0'};
+
+   funcao(vetor);
+   conta = 0;
+   for (i=0; i<MAX; i++){
+        if (vetor[i] != '\0'){
+           conta++;
+        }
+   }
+   printf("conta = %d", conta);
+   return 0;
+}
+void funcao(char v[MAX]){
+   strcpy(v, TEXTO);
+   strcat(v, "PL");
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    ["conta = 7", true, C`"prog1" + "PL" = "prog1PL" → 7 caracteres.`],
+    ["conta = 5", false, C`O strcat acrescenta "PL" ao fim.`],
+    ["conta = 12", false, C`As posições depois do texto continuam '\0'.`],
+    ["conta = 8", false, C`O '\0' final não é contado (a condição é != '\0').`]
+  ],
+  exp:C`<code>strcpy</code> põe "prog1"; <code>strcat</code> junta "PL" no fim → "prog1PL" (7 letras + '\0'). Conta os não-'\0' → <b>7</b>. Lembra-te: os dígitos ('1') também são caracteres.`
+},
+{ id:"N4", src:"novo", label:"Extra 4", tema:"Estruturas e ponteiros",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define MAX 23
+#define CINCO 5
+#define NUMDECIMAL 0.666
+#define DOIS 2
+typedef struct{
+    int x;
+    float y;
+} tipoNumeros;
+void g(tipoNumeros *a);
+int main(void){
+    tipoNumeros dados;
+
+    dados.x = DOIS;
+    dados.y = NUMDECIMAL;
+    g(&dados);
+    printf(" main() x=%d  y=%.2f \n",  dados.x, dados.y);
+    return 0;
+}
+void g(tipoNumeros *a){
+    printf(" g() x=%d  y=%.2f \n",  a->x, a->y);
+    a->x = MAX % CINCO;
+    a->y = (float) MAX / CINCO;
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [C`g() x=2  y=0.67
+main() x=3  y=4.60`, true, C`23%5=3; com o cast (float) a divisão é real: 4.60.`],
+    [C`g() x=2  y=0.67
+main() x=3  y=4.00`, false, C`Há um cast <code>(float)</code> → a divisão não é inteira.`],
+    [C`g() x=2  y=0.666
+main() x=3  y=4.60`, false, C`<code>%.2f</code> → 0.67.`],
+    [C`g() x=2  y=0.67
+main() x=2  y=0.67`, false, C`g recebe &amp;dados → as alterações ficam no main.`]
+  ],
+  exp:C`Diferença em relação à pergunta 4: o <code>(float)</code> converte MAX antes de dividir → 23.0/5 = <b>4.60</b>. Sem o cast seria 4 → 4.00.`
+},
+{ id:"N5", src:"novo", label:"Extra 5", tema:"Estruturas por valor",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define VALOR 2.50
+#define VIAGENS 4
+typedef struct{
+    int dias;
+    float portagem;
+} tipoTeste;
+void g(tipoTeste a);
+int main(void){
+    tipoTeste dados;
+
+    dados.dias = 1;
+    dados.portagem = VALOR;
+    g(dados);
+    dados.dias++;
+    printf(" main() dias=%d  portagem=%.2f \n",  dados.dias, dados.portagem);
+    return 0;
+}
+void g(tipoTeste a){
+    a.dias = a.dias + VIAGENS;
+    a.portagem = a.portagem * VIAGENS;
+    printf(" g() dias=%d  portagem=%.2f \n",  a.dias, a.portagem);
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [C`g() dias=5  portagem=10.00
+main() dias=2  portagem=2.50`, true, C`g altera a cópia (1+4, 2.5×4); o main só faz dias++ ao original.`],
+    [C`g() dias=5  portagem=10.00
+main() dias=6  portagem=10.00`, false, C`A struct é passada por valor; o main não vê as alterações de g.`],
+    [C`g() dias=4  portagem=10.00
+main() dias=2  portagem=2.50`, false, C`a.dias começa com 1 (é cópia de dados), logo 1+4 = 5.`],
+    [C`g() dias=5  portagem=10.0
+main() dias=1  portagem=2.5`, false, C`%.2f mostra 2 casas e o main faz dias++.`]
+  ],
+  exp:C`A cópia <code>a</code> começa igual a dados (1, 2.50). g imprime 5 e 10.00. De volta ao main, dados continua (1, 2.50) e depois <code>dados.dias++</code> → 2.`
+},
+{ id:"N6", src:"novo", label:"Extra 6", tema:"Vetor de structs + ponteiro",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define MAX 4
+#define DOIS 2
+#define MEIO 0.5
+
+typedef struct{
+    int x;
+    float y;
+} tipoTeste;
+
+void f(tipoTeste v[MAX], int *c);
+
+int main(void){
+    int k;
+    tipoTeste vetor[MAX]= {0};
+
+    k = DOIS;
+    f(vetor, &k);
+    printf("vetor[%d].x=%d  vetor[%d].y=%.2f", DOIS, vetor[DOIS].x, k, vetor[k].y);
+    return 0;
+}
+void f(tipoTeste v[MAX], int *c){
+    int i;
+
+    for (i=0; i<MAX; i++){
+        v[i].x = i * (*c);
+        v[i].y = (i+1) * MEIO;
+    }
+    (*c)--;
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    ["vetor[2].x=4  vetor[1].y=1.00", true, C`v[2].x=2×2=4; k passa a 1; v[1].y=(1+1)×0.5=1.00.`],
+    ["vetor[2].x=4  vetor[2].y=1.50", false, C`Esqueceste o <code>(*c)--</code>: k passa a 1.`],
+    ["vetor[2].x=2  vetor[1].y=1.00", false, C`x = i × (*c) = 2 × 2 = 4.`],
+    ["vetor[2].x=0  vetor[1].y=0.00", false, C`O vetor é alterado pela função.`]
+  ],
+  exp:C`Durante o ciclo <code>*c</code> vale 2: <code>v[2].x = 2*2 = 4</code>. Depois <code>(*c)--</code> → k = 1 no main. <code>vetor[1].y = (1+1)*0.5 = 1.00</code>. Nota: o primeiro índice é DOIS (constante), o segundo é k.`
+},
+{ id:"N7", src:"novo", label:"Extra 7", tema:"Vetor de structs + return",
+  txt:"Considere o seguinte programa codificado em linguagem C (repara bem na chamada da função):",
+  code:C`#include <stdio.h>
+#define MAX 5
+#define TRES 3
+#define UM 1
+#define MEIO 0.5
+
+typedef struct{
+    int x;
+    float y;
+} tipoTeste;
+
+int f(tipoTeste v[MAX], int c);
+
+int main(void){
+    int k;
+    tipoTeste vetor[MAX]= {0};
+
+    k = TRES;
+    f(vetor, k);
+    printf("vetor[%d].x=%d  vetor[%d].y=%.2f", UM, vetor[UM].x, k, vetor[k].y);
+    return 0;
+}
+int f(tipoTeste v[MAX], int c){
+    int i;
+
+    for (i=0; i<MAX; i++){
+        v[i].x = i - c;
+        v[i].y = (i+MAX) * MEIO;
+    }
+    c++;
+    return c;
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    [OPTS_F[1], false, C`A função devolve 4, mas o main <b>não guarda</b> o valor (não há <code>k = </code>).`],
+    [OPTS_F[3], true, C`O return é ignorado → k continua 3 → vetor[3].y=4.00.`],
+    [OPTS_F[0], false, C`k vale 3.`],
+    [OPTS_F[2], false, C`O vetor é alterado.`]
+  ],
+  exp:C`Ratoeira clássica: a função devolve um valor, mas <code>f(vetor, k);</code> deita-o fora. Só <code>k = f(vetor, k);</code> alteraria k. Logo k=3 → <code>vetor[1].x=-2  vetor[3].y=4.00</code>.`
+},
+{ id:"N8", src:"novo", label:"Extra 8", tema:"Funções com structs",
+  txt:C`A função <b>mostraInfoUtente()</b> recebe o <b>endereço</b> de um utente e lista no monitor a sua informação. Considerando as seguintes declarações:`,
+  code:C`typedef struct{
+    int dia;
+    int mes;
+    int ano;
+}tipoData;
+
+typedef struct{
+    int codigo;
+    char nome[50];
+    tipoData dataNascimento;
+}tipoUtente;
+
+void mostraData (tipoData data);  /* apresenta no monitor uma data */`,
+  ask:C`Indique a codificação mais correta para a função <b>mostraInfoUtente()</b>.`,
+  ops:[
+    [C`void mostraInfoUtente(tipoUtente *dados){
+    printf("\nCodigo: %d", dados->codigo);
+    printf("\nNome: %s", dados->nome);
+    mostraData(dados->dataNascimento);
+}`, true, C`Ponteiro → <code>-&gt;</code>; mostraData recebe a data (valor).`],
+    [C`void mostraInfoUtente(tipoUtente *dados){
+    printf("\nCodigo: %d", dados.codigo);
+    printf("\nNome: %s", dados.nome);
+    mostraData(dados.dataNascimento);
+}`, false, C`Com ponteiro não se usa o ponto.`],
+    [C`void mostraInfoUtente(tipoUtente *dados){
+    printf("\nCodigo: %d", dados->codigo);
+    printf("\nNome: %s", dados->nome);
+    mostraData(&dados->dataNascimento);
+}`, false, C`mostraData recebe <code>tipoData</code>, não um ponteiro.`],
+    [C`void mostraInfoUtente(tipoUtente *dados){
+    printf("\nCodigo: %d", *dados.codigo);
+    printf("\nNome: %s", *dados.nome);
+    mostraData(*dados.dataNascimento);
+}`, false, C`<code>*dados.codigo</code> = <code>*(dados.codigo)</code> (o ponto tem prioridade). Seria <code>(*dados).codigo</code>.`]
+  ],
+  exp:C`Com ponteiro para struct: <code>dados-&gt;campo</code> ≡ <code>(*dados).campo</code>. Os parênteses são obrigatórios porque <code>.</code> tem mais prioridade que <code>*</code>.`
+},
+{ id:"N9", src:"novo", label:"Extra 9", tema:"Ciclos com vetor de structs",
+  txt:"Pretende-se listar no monitor todos os imóveis registados. Considere as seguintes declarações:",
+  code:DECL_IMOVEL + C`
+
+void mostraImovel(tipoImovel *dados);  /* apresenta os dados de UM imóvel */
+
+int main(void){
+    tipoImovel vetor[MAX_IMOVEIS];
+    int i, quantImoveis=0;
+
+    /* ... código que preenche o vetor e quantImoveis ... */
+
+    /* Código para listar dados dos imóveis */
+    return 0;
+}`,
+  ask:"Indique o bloco de código mais correto para listar todos os imóveis.",
+  ops:[
+    [C`for (i=0; i<quantImoveis; i++){
+    mostraImovel(&vetor[i]);
+}`, true, C`Função recebe ponteiro → passa-se &amp;vetor[i], até quantImoveis.`],
+    [C`for (i=0; i<quantImoveis; i++){
+    mostraImovel(vetor[i]);
+}`, false, C`Passa uma struct a uma função que espera um ponteiro.`],
+    [C`mostraImovel(vetor, quantImoveis);`, false, C`A função só recebe um imóvel.`],
+    [C`for (i=0; i<MAX_IMOVEIS; i++){
+    mostraImovel(&vetor[i]);
+}`, false, C`Mostraria também as posições vazias (lixo) até 1000.`]
+  ],
+  exp:C`Mesmo raciocínio da pergunta 13, mas com o protótipo <code>void mostraImovel(tipoImovel *dados)</code> → <code>&amp;vetor[i]</code>. O ciclo vai sempre até <b>quantImoveis</b>, não até o máximo.`
+},
+{ id:"N10", src:"novo", label:"Extra 10", tema:"Declaração de estruturas",
+  txt:"Pretende-se armazenar a informação dos alunos inscritos numa UC. Para cada aluno: número, nome, data de nascimento e as notas de 3 testes. Existem no máximo 200 alunos.",
+  code:"",
+  ask:"Indique as declarações mais corretas para a definição da estrutura de dados.",
+  ops:[
+    [C`typedef struct{ int dia; int mes; int ano; }tipoData;
+
+typedef struct{
+    int numero;
+    char nome[80];
+    tipoData dataNascimento;
+    float notas[3];
+}tipoAluno;
+
+int main(void){
+    tipoAluno vetor[200];
+    int quantAlunos=0;
+    ...`, true, C`Data como struct, nome como string, 3 notas num vetor, vetor de 200 e contador a 0.`],
+    [C`typedef struct{ int dia; int mes; int ano; }tipoData;
+
+typedef struct{
+    int numero;
+    char nome;
+    tipoData dataNascimento;
+    float notas[3];
+}tipoAluno;
+
+int main(void){
+    tipoAluno vetor[200];
+    int quantAlunos=0;
+    ...`, false, C`<code>char nome;</code> só guarda 1 letra.`],
+    [C`typedef struct{ int dia; int mes; int ano; }tipoData;
+
+typedef struct{
+    int numero;
+    char nome[80];
+    tipoData dataNascimento;
+    float notas[3];
+}tipoAluno;
+
+int main(void){
+    tipoAluno vetor=0;
+    int quantAlunos=200;
+    ...`, false, C`Não é um vetor e o contador não começa em 200.`],
+    [C`typedef struct{ int dia; int mes; int ano; }tipoData;
+
+typedef struct{
+    int numero;
+    char nome[80];
+    tipoData dataNascimento[3];
+    float notas;
+}tipoAluno;
+
+int main(void){
+    tipoAluno vetor[200];
+    int quantAlunos=0;
+    ...`, false, C`Trocou: 3 datas e 1 nota. Deve ser 1 data e 3 notas.`]
+  ],
+  exp:C`Mesmo padrão da pergunta 12. Pensa “quantos de cada?”: 1 número, 1 nome (string), 1 data, <b>3</b> notas → <code>float notas[3]</code>.`
+},
+{ id:"N11", src:"novo", label:"Extra 11", tema:"Ficheiros binários",
+  txt:C`A função <b>gravaFicheiroBinario()</b> grava os imóveis no ficheiro IMOVEIS.DAT de forma compatível com a leitura das perguntas 17/18 (primeiro a quantidade, depois o vetor).`,
+  code:DECL_IMOVEL,
+  ask:"Indique a codificação mais correta.",
+  ops:[
+    [C`void gravaFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int quantImoveis){
+    FILE *fp;
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp != NULL) {
+        fwrite(&quantImoveis, sizeof(int), 1, fp);
+        fwrite(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`"rb" abre só para leitura — não dá para escrever.`],
+    [C`void gravaFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int quantImoveis){
+    FILE *fp;
+    fp = fopen("IMOVEIS.DAT", "wb");
+    if (fp != NULL) {
+        fwrite(&quantImoveis, sizeof(int), 1, fp);
+        fwrite(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, true, C`Modo, verificação, ordem e tamanhos corretos.`],
+    [C`void gravaFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int quantImoveis){
+    FILE *fp;
+    fp = fopen("IMOVEIS.DAT", "wb");
+    if (fp != NULL) {
+        fwrite(&quantImoveis, sizeof(int), 1, fp);
+        fwrite(vetor, sizeof(int), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`Cada elemento do vetor tem tamanho <code>sizeof(tipoImovel)</code>, não sizeof(int).`],
+    [C`void gravaFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int quantImoveis){
+    FILE *fp;
+    fp = fopen("IMOVEIS.DAT", "wb");
+    if (fp != NULL) {
+        fwrite(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fwrite(&quantImoveis, sizeof(int), 1, fp);
+        fclose(fp);
+    }
+}`, false, C`Ordem trocada: a leitura espera o int primeiro.`]
+  ],
+  exp:C`fwrite(<b>endereço</b>, <b>tamanho de 1 elemento</b>, <b>quantos</b>, fp). A ordem de escrita tem de ser igual à ordem de leitura.`
+},
+{ id:"N12", src:"novo", label:"Extra 12", tema:"Ficheiros binários",
+  txt:C`Versão da função <b>leFicheiroBinario()</b> que devolve a quantidade através de um ponteiro.`,
+  code:DECL_IMOVEL,
+  ask:"Indique a codificação mais correta.",
+  ops:[
+    [C`void leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int *quantImoveis){
+    FILE *fp;
+    *quantImoveis = 0;
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp != NULL) {
+        fread(quantImoveis, sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), *quantImoveis, fp);
+        fclose(fp);
+    }
+}`, true, C`<code>quantImoveis</code> já é um endereço (≡ <code>&amp;(*quantImoveis)</code>), por isso vai sem &amp;.`],
+    [C`void leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int *quantImoveis){
+    FILE *fp;
+    *quantImoveis = 0;
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp != NULL) {
+        fread(&quantImoveis, sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), *quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`<code>&amp;quantImoveis</code> é o endereço do <b>ponteiro</b> — escrevia por cima do ponteiro.`],
+    [C`void leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int *quantImoveis){
+    FILE *fp;
+    *quantImoveis = 0;
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp != NULL) {
+        fread(quantImoveis, sizeof(int), 1, fp);
+        fread(vetor, sizeof(tipoImovel), quantImoveis, fp);
+        fclose(fp);
+    }
+}`, false, C`A quantidade de elementos é o valor <code>*quantImoveis</code>, não o ponteiro.`],
+    [C`void leFicheiroBinario(tipoImovel vetor[MAX_IMOVEIS], int *quantImoveis){
+    FILE *fp;
+    *quantImoveis = 0;
+    fp = fopen("IMOVEIS.DAT", "rb");
+    if (fp != NULL) {
+        fread(vetor, sizeof(tipoImovel), *quantImoveis, fp);
+        fread(quantImoveis, sizeof(int), 1, fp);
+        fclose(fp);
+    }
+}`, false, C`Ordem trocada: leria 0 imóveis (quantidade ainda é 0) e depois leria lixo.`]
+  ],
+  exp:C`Com <code>int *q</code>: <code>q</code> = endereço, <code>*q</code> = valor. Logo <code>fread(q, …)</code> (ou <code>&amp;(*q)</code>, que é igual — foi o que apareceu na pergunta 17) e <code>fread(vetor, sizeof(tipoImovel), *q, fp)</code>.`
+},
+{ id:"N13", src:"novo", label:"Extra 13", tema:"Ponteiros para structs",
+  txt:C`Dentro da função <code>void obtemImovel(tipoImovel *dados)</code>, qual das seguintes instruções é <b>equivalente</b> a:`,
+  code:C`dados->precoVenda = lerFloat(0, 9999.99);`,
+  ask:"Selecione a instrução equivalente:",
+  ops:[
+    [C`(*dados).precoVenda = lerFloat(0, 9999.99);`, true, C`<code>a-&gt;b</code> é atalho para <code>(*a).b</code>.`],
+    [C`*dados.precoVenda = lerFloat(0, 9999.99);`, false, C`Sem parênteses lê-se <code>*(dados.precoVenda)</code> → erro.`],
+    [C`dados.precoVenda = lerFloat(0, 9999.99);`, false, C`dados é ponteiro; não tem campos acessíveis com ponto.`],
+    [C`&dados.precoVenda = lerFloat(0, 9999.99);`, false, C`Não se pode atribuir a um endereço, e o ponto continua errado.`]
+  ],
+  exp:C`<code>-&gt;</code> = “desreferencia e acede ao campo”. A forma longa precisa de parênteses: <code>(*dados).campo</code>.`
+},
+{ id:"N14", src:"novo", label:"Extra 14", tema:"Aritmética e printf",
+  txt:"Considere o seguinte programa codificado em linguagem C:",
+  code:C`#include <stdio.h>
+#define A 17
+#define B 4
+int main(void){
+    int r;
+    float m;
+
+    r = A % B;
+    m = A / B;
+    printf("r=%d m=%.2f", r, m);
+    m = (float) A / B;
+    printf(" m=%.2f", m);
+    return 0;
+}`,
+  ask:"O resultado no monitor será o seguinte",
+  ops:[
+    ["r=1 m=4.00 m=4.25", true, C`17%4=1; 17/4=4 (inteiros) → 4.00; com cast → 4.25.`],
+    ["r=1 m=4.25 m=4.25", false, C`A primeira divisão é entre dois int → 4.`],
+    ["r=4 m=4.00 m=4.25", false, C`% dá o resto (1), não o quociente.`],
+    ["r=1 m=4 m=4.25", false, C`%.2f mostra sempre duas casas: 4.00.`]
+  ],
+  exp:C`O tipo da <b>variável de destino</b> não muda a divisão: <code>17/4</code> é calculado entre int (=4) e só depois convertido para float (4.00). Para dar 4.25 é preciso que um dos operandos seja float: <code>(float)A/B</code>.`
+},
+{ id:"N15", src:"novo", label:"Extra 15", tema:"Funções de leitura",
+  txt:C`A função <b>obtemImovel()</b> recebe o endereço de um imóvel e preenche-o. Considerando:`,
+  code:DECL_IMOVEL_DATA + C`
+
+float lerFloat (float min, float max);
+void lerString (char vetor[], int max);
+void lerData (tipoData *data);`,
+  ask:C`Indique a codificação mais correta para <code>void obtemImovel(tipoImovel *dados)</code>.`,
+  ops:[
+    [C`void obtemImovel(tipoImovel *dados){
+    lerString(dados->designacao,50);
+    lerData(&dados->dataVenda);
+    dados->precoVenda=lerFloat(0,9999.99);
+}`, true, C`lerData recebe o endereço do campo dataVenda: <code>&amp;dados-&gt;dataVenda</code>.`],
+    [C`void obtemImovel(tipoImovel *dados){
+    lerString(dados->designacao,50);
+    lerData(dados->dataVenda);
+    dados->precoVenda=lerFloat(0,9999.99);
+}`, false, C`Falta o &amp;: lerData espera um ponteiro.`],
+    [C`void obtemImovel(tipoImovel *dados){
+    lerString(dados->designacao,50);
+    lerData(&dados.dataVenda);
+    dados->precoVenda=lerFloat(0,9999.99);
+}`, false, C`dados é ponteiro → <code>-&gt;</code>, não ponto.`],
+    [C`void obtemImovel(tipoImovel *dados){
+    lerString(&dados->designacao,50);
+    dados->dataVenda=lerData();
+    dados->precoVenda=lerFloat(0,9999.99);
+}`, false, C`lerData é void e recebe ponteiro; e a string não leva &amp;.`]
+  ],
+  exp:C`Combina as perguntas 10 e 11. <code>&amp;dados-&gt;dataVenda</code> = endereço do campo (o <code>-&gt;</code> é aplicado primeiro). A string <code>designacao</code> já é um endereço (vetor), por isso não leva &amp;.`
+}
+];
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+function h(tag, attrs, ...kids){
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs||{})){
+    if (v === undefined || v === null || v === false) continue;
+    if (k === "class") e.className = v;
+    else if (k === "html") e.innerHTML = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()){
+    if (k === null || k === undefined || k === false) continue;
+    e.append(k instanceof Node ? k : document.createTextNode(String(k)));
+  }
+  return e;
+}
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const byId = Object.fromEntries(QS.map(q => [q.id, q]));
+const correctIdx = q => q.ops.findIndex(o => o[1]);
+const LET = "abcdefgh";
+const fmt = n => (Math.round(n*100)/100).toString().replace(".", ",");
+
+/* ============================================================
+   TEMA
+   ============================================================ */
+(function(){
+  const saved = store.get("prog1_theme", null);
+  if (saved) document.documentElement.dataset.theme = saved;
+  $("#themeBtn").addEventListener("click", () => {
+    const cur = document.documentElement.dataset.theme ||
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const nxt = cur === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = nxt;
+    store.set("prog1_theme", nxt);
+  });
+})();
+
+/* ============================================================
+   TABS
+   ============================================================ */
+function showTab(name){
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
+  document.querySelectorAll("section.tab").forEach(s => s.classList.toggle("on", s.id === "tab-"+name));
+  if (name === "historico") renderHist();
+  store.set("prog1_tab", name);
+  window.scrollTo(0,0);
+}
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.tab); });
+
+/* ============================================================
+   CARTÕES
+   ============================================================ */
+function qHead(q, label){
+  return h("div", {class:"qhead"},
+    h("span", {class:"qnum"}, label || q.label),
+    h("span", {class:"chip"}, q.tema),
+    q.src === "orig" ? h("span",{class:"chip chip-o"},"Teste de treino · P"+q.id.slice(1)) : h("span",{class:"chip chip-n"},"Nova"));
+}
+function qBody(q){
+  return [
+    h("p", {class:"qtxt", html:q.txt}),
+    q.code ? h("pre", {class:"code"}, q.code) : null,
+    q.ask ? h("p", {class:"qask", html:q.ask}) : null
+  ];
+}
+/* opts: {hide, order, chosen, label} */
+function solutionCard(q, opts={}){
+  const order = opts.order || q.ops.map((_,i)=>i);
+  const card = h("article", {class:"card" + (opts.hide ? " hidden-sol" : "")});
+  card.append(qHead(q, opts.label), ...qBody(q));
+  const ol = h("ol", {class:"opts"});
+  order.forEach((oi, pos) => {
+    const o = q.ops[oi];
+    let cls = "opt " + (o[1] ? "ok" : "bad");
+    if (opts.chosen === oi && !o[1]) cls += " chosen-bad";
+    ol.append(h("li", {class:cls},
+      h("span", {class:"letter"}, LET[pos]),
+      h("div", {class:"optbody"},
+        h("pre", {class:"opttxt"}, o[0]),
+        opts.chosen === oi ? h("span",{class:"tag mine"},"a tua resposta") : null,
+        h("div", {class:"why", html:(o[1] ? "✔ Correta. " : "✘ ") + o[2]}))));
+  });
+  if (opts.chosen === -1 || opts.chosen === null && opts.review){
+    card.append(h("p", {class:"note"}, opts.chosen === -1 ? "Escolheste “Não responder”." : "Não respondeste."));
+  }
+  card.append(ol);
+  card.append(h("div", {class:"exp", html:"<strong>Explicação</strong>" + q.exp}));
+  if (opts.hide) card.append(h("button", {class:"btn ghost reveal", type:"button", onclick:()=>card.classList.remove("hidden-sol")}, "Ver solução"));
+  return card;
+}
+
+/* ============================================================
+   CORREÇÃO
+   ============================================================ */
+function renderCorrecao(){
+  const f = $("#f-src").value, hide = $("#f-hide").checked;
+  const list = $("#corr-list"); list.textContent = "";
+  QS.filter(q => f === "all" || q.src === f).forEach(q => list.append(solutionCard(q, {hide})));
+}
+$("#f-src").addEventListener("change", renderCorrecao);
+$("#f-hide").addEventListener("change", renderCorrecao);
+
+/* ============================================================
+   TESTE
+   ============================================================ */
+let T = null, timerId = null;
+const POOL_NAMES = {orig:"Teste de treino (18)", novo:"Perguntas novas (15)", mix:"18 aleatórias", all:"Todas (33)"};
+
+function saveT(){ if (T) store.set("prog1_cur", T); }
+
+function startTest(){
+  const pool = $("#t-pool").value;
+  let qs;
+  if (pool === "orig") qs = QS.filter(q => q.src === "orig");
+  else if (pool === "novo") qs = QS.filter(q => q.src === "novo");
+  else if (pool === "mix") qs = shuffle(QS.slice()).slice(0, 18);
+  else qs = QS.slice();
+  if ($("#t-shufq").checked) qs = shuffle(qs.slice());
+  const shufo = $("#t-shufo").checked;
+  T = {
+    pool,
+    ids: qs.map(q => q.id),
+    ord: qs.map(q => shufo ? shuffle(q.ops.map((_,i)=>i)) : q.ops.map((_,i)=>i)),
+    ans: qs.map(() => null),
+    cur: 0,
+    pen: parseFloat($("#t-pen").value) || 0,
+    mins: Math.max(0, parseInt($("#t-mins").value, 10) || 0),
+    start: Date.now()
+  };
+  saveT();
+  runTest();
+}
+$("#t-start").addEventListener("click", startTest);
+
+function runTest(){
+  $("#t-setup").hidden = true; $("#t-result").hidden = true; $("#t-resume").textContent = "";
+  $("#t-run").hidden = false;
+  clearInterval(timerId);
+  timerId = setInterval(tick, 1000);
+  renderQ();
+}
+
+function remaining(){ return T.mins ? T.mins*60 - Math.floor((Date.now()-T.start)/1000) : null; }
+function elapsed(){ return Math.floor((Date.now()-T.start)/1000); }
+function mmss(s){ s = Math.max(0, s); const m = Math.floor(s/60), r = s%60; return m + ":" + String(r).padStart(2,"0"); }
+function tick(){
+  if (!T) return;
+  const el = $("#timer"); if (!el) return;
+  if (T.mins){
+    const r = remaining();
+    el.textContent = "Tempo restante " + mmss(r);
+    el.classList.toggle("low", r <= 300);
+    if (r <= 0){ finishTest(true); }
+  } else {
+    el.textContent = "Tempo " + mmss(elapsed());
+  }
+}
+
+function renderQ(){
+  const run = $("#t-run"); run.textContent = "";
+  const n = T.ids.length, i = T.cur, q = byId[T.ids[i]];
+  const answered = T.ans.filter(a => a !== null).length;
+
+  run.append(h("div", {class:"runbar"},
+    h("strong", {}, `Pergunta ${i+1} de ${n}`),
+    h("span", {class:"timer", id:"timer"}, ""),
+    h("button", {class:"btn ghost", type:"button", onclick:()=>{
+      const falta = n - answered;
+      if (confirm(falta ? `Ainda tens ${falta} pergunta(s) sem resposta (contam como não respondidas). Terminar?` : "Terminar o teste?")) finishTest(false);
+    }}, "Terminar teste")));
+
+  const card = h("article", {class:"card"});
+  card.append(qHead(q, `Pergunta ${i+1}`), ...qBody(q));
+  const box = h("div", {class:"opts", style:"display:grid;gap:8px"});
+  const mk = (val, content, mono) => {
+    const sel = T.ans[i] === val;
+    const inp = h("input", {type:"radio", name:"r", checked:sel});
+    inp.addEventListener("change", () => { T.ans[i] = val; saveT(); renderQ(); });
+    return h("label", {class:"ans" + (sel ? " sel" : "")}, inp,
+      mono ? h("pre", {class:"opttxt"}, content) : h("span", {}, content));
+  };
+  T.ord[i].forEach((oi, pos) => box.append(mk(oi, q.ops[oi][0], true)));
+  box.append(mk(-1, "NÃO RESPONDER", true));
+  card.append(box);
+  if (T.ans[i] !== null){
+    card.append(h("div", {style:"margin-top:8px"},
+      h("button", {class:"btn ghost", type:"button", onclick:()=>{ T.ans[i] = null; saveT(); renderQ(); }}, "Limpar escolha")));
+  }
+  run.append(card);
+
+  run.append(h("div", {class:"navrow"},
+    h("button", {class:"btn ghost", type:"button", disabled:i===0, onclick:()=>go(i-1)}, "← Anterior"),
+    i < n-1 ? h("button", {class:"btn", type:"button", onclick:()=>go(i+1)}, "Seguinte →")
+            : h("button", {class:"btn", type:"button", onclick:()=>{ if (confirm("Terminar o teste?")) finishTest(false); }}, "Terminar")));
+
+  const grid = h("div", {class:"grid"});
+  T.ids.forEach((_, k) => grid.append(h("button", {
+    type:"button", class:(T.ans[k] !== null ? "done" : "") + (k === i ? " cur" : ""),
+    title: T.ans[k] === null ? "Sem resposta" : (T.ans[k] === -1 ? "Não responder" : "Respondida"),
+    onclick:()=>go(k)}, k+1)));
+  run.append(h("div", {class:"card"}, h("div", {class:"note"}, `Navegação · ${answered}/${n} respondidas`), grid));
+  tick();
+}
+function go(k){ T.cur = k; saveT(); renderQ(); window.scrollTo(0,0); }
+
+document.addEventListener("keydown", e => {
+  if (!T || $("#t-run").hidden || !$("#tab-teste").classList.contains("on")) return;
+  if (e.target.matches("input[type=number],select,textarea")) return;
+  if (e.key === "ArrowRight" && T.cur < T.ids.length-1) go(T.cur+1);
+  else if (e.key === "ArrowLeft" && T.cur > 0) go(T.cur-1);
+  else if (/^[1-4]$/.test(e.key)){ const oi = T.ord[T.cur][+e.key-1]; if (oi !== undefined){ T.ans[T.cur] = oi; saveT(); renderQ(); } }
+  else if (e.key === "0"){ T.ans[T.cur] = -1; saveT(); renderQ(); }
+});
+
+function grade(t){
+  let ok=0, bad=0, nr=0;
+  const st = t.ids.map((id, k) => {
+    const a = t.ans[k], q = byId[id];
+    if (a === null || a === -1){ nr++; return "nr"; }
+    if (a === correctIdx(q)){ ok++; return "ok"; }
+    bad++; return "bad";
+  });
+  const pts = ok - t.pen*bad;
+  const nota = Math.max(0, pts) / t.ids.length * 20;
+  return {ok, bad, nr, pts, nota, st};
+}
+
+function finishTest(timeUp){
+  clearInterval(timerId);
+  const g = grade(T);
+  const hist = store.get("prog1_hist", []);
+  hist.unshift({d:Date.now(), pool:T.pool, n:T.ids.length, ok:g.ok, bad:g.bad, nr:g.nr, pen:T.pen, nota:g.nota, dur:elapsed()});
+  store.set("prog1_hist", hist.slice(0, 100));
+  store.del("prog1_cur");
+  showResult(T, g, timeUp);
+}
+
+function showResult(t, g, timeUp){
+  $("#t-run").hidden = true; $("#t-setup").hidden = true;
+  const res = $("#t-result"); res.hidden = false; res.textContent = "";
+  if (timeUp) res.append(h("div", {class:"banner"}, "⏰ O tempo acabou — o teste foi entregue automaticamente."));
+  res.append(h("div", {class:"card"},
+    h("h2", {style:"margin:0 0 4px;font-size:1.2rem"}, "Resultado"),
+    h("div", {class:"note"}, `${POOL_NAMES[t.pool]} · desconto por errada: ${t.pen ? "−"+fmt(t.pen) : "nenhum"} · duração ${mmss(Math.floor((Date.now()-t.start)/1000))}`),
+    h("div", {class:"stats"},
+      h("div", {class:"stat"}, h("div",{class:"v"}, fmt(g.nota)), h("div",{class:"l"},"Nota (0–20)")),
+      h("div", {class:"stat"}, h("div",{class:"v"}, fmt(g.pts)+" / "+t.ids.length), h("div",{class:"l"},"Pontos")),
+      h("div", {class:"stat ok"}, h("div",{class:"v"}, g.ok), h("div",{class:"l"},"Certas")),
+      h("div", {class:"stat bad"}, h("div",{class:"v"}, g.bad), h("div",{class:"l"},"Erradas")),
+      h("div", {class:"stat"}, h("div",{class:"v"}, g.nr), h("div",{class:"l"},"Não respondidas"))),
+    (() => { const gr = h("div", {class:"grid"});
+      t.ids.forEach((_, k) => gr.append(h("button", {type:"button", class:g.st[k]==="ok"?"ok":g.st[k]==="bad"?"bad":"",
+        onclick:()=>{ const el = document.getElementById("rev-"+k); if (el) el.scrollIntoView({behavior:"smooth"}); }}, k+1)));
+      return gr; })(),
+    h("div", {style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"},
+      h("button", {class:"btn", type:"button", onclick:newTest}, "Novo teste"),
+      h("button", {class:"btn ghost", type:"button", onclick:() => {
+        const pool = t.ids.filter((_,k) => g.st[k] !== "ok");
+        if (!pool.length){ alert("Acertaste tudo — não há nada para repetir!"); return; }
+        T = {pool:t.pool, ids:shuffle(pool.slice()), ord:null, ans:null, cur:0, pen:t.pen, mins:0, start:Date.now()};
+        T.ord = T.ids.map(id => shuffle(byId[id].ops.map((_,i)=>i)));
+        T.ans = T.ids.map(() => null);
+        saveT(); runTest();
+      }}, "Repetir só as que falhei"))));
+
+  const filt = h("label", {class:"note", style:"display:flex;gap:6px;align-items:center;margin:4px 0 12px"},
+    h("input", {type:"checkbox", id:"onlyBad"}), "Mostrar só erradas e não respondidas");
+  res.append(filt);
+  const list = h("div", {});
+  const draw = () => {
+    list.textContent = "";
+    const only = $("#onlyBad").checked;
+    t.ids.forEach((id, k) => {
+      if (only && g.st[k] === "ok") return;
+      const icon = g.st[k] === "ok" ? "✔ " : g.st[k] === "bad" ? "✘ " : "– ";
+      const c = solutionCard(byId[id], {order:t.ord[k], chosen:t.ans[k], review:true, label: icon + "Pergunta " + (k+1)});
+      c.id = "rev-"+k;
+      list.append(c);
+    });
+  };
+  res.append(list);
+  $("#onlyBad").addEventListener("change", draw);
+  draw();
+  window.scrollTo(0,0);
+}
+
+function newTest(){
+  T = null; clearInterval(timerId);
+  $("#t-result").hidden = true; $("#t-run").hidden = true; $("#t-setup").hidden = false;
+  checkResume();
+  window.scrollTo(0,0);
+}
+
+function checkResume(){
+  const box = $("#t-resume"); box.textContent = "";
+  const cur = store.get("prog1_cur", null);
+  if (!cur || !cur.ids || T) return;
+  const ans = cur.ans.filter(a => a !== null).length;
+  box.append(h("div", {class:"banner"},
+    h("span", {}, `Tens um teste a meio (${ans}/${cur.ids.length} respondidas).`),
+    h("button", {class:"btn", type:"button", onclick:()=>{ T = cur; runTest(); }}, "Continuar"),
+    h("button", {class:"btn danger", type:"button", onclick:()=>{ store.del("prog1_cur"); box.textContent = ""; }}, "Descartar")));
+}
+
+/* ============================================================
+   HISTÓRICO
+   ============================================================ */
+function renderHist(){
+  const box = $("#hist"); box.textContent = "";
+  const hist = store.get("prog1_hist", []);
+  if (!hist.length){
+    box.append(h("div", {class:"card"}, h("p", {style:"margin:0"}, "Ainda não fizeste nenhum teste. Os resultados ficam guardados neste browser.")));
+    return;
+  }
+  const tb = h("tbody", {});
+  hist.forEach(r => tb.append(h("tr", {},
+    h("td", {}, new Date(r.d).toLocaleString("pt-PT", {dateStyle:"short", timeStyle:"short"})),
+    h("td", {}, POOL_NAMES[r.pool] || r.pool),
+    h("td", {}, r.ok), h("td", {}, r.bad), h("td", {}, r.nr),
+    h("td", {}, h("strong", {}, fmt(r.nota))),
+    h("td", {}, mmss(r.dur)))));
+  box.append(h("div", {class:"card"},
+    h("div", {class:"tablewrap"}, h("table", {},
+      h("thead", {}, h("tr", {}, ["Data","Perguntas","Certas","Erradas","N/R","Nota","Tempo"].map(x => h("th", {}, x)))),
+      tb)),
+    h("div", {style:"margin-top:12px"},
+      h("button", {class:"btn danger", type:"button", onclick:()=>{ if (confirm("Apagar todo o histórico?")){ store.del("prog1_hist"); renderHist(); } }}, "Apagar histórico"))));
+}
+
+/* ============================================================
+   CÁBULA
+   ============================================================ */
+const CABULA = [
+["1. Passagem de parâmetros (a pergunta mais repetida!)", C`<ul>
+<li><b>int, float, struct</b> passados normalmente → <b>cópia</b>. Alterações dentro da função <b>perdem-se</b> (P5, P7).</li>
+<li><b>Vetores</b> (incluindo strings) → passam sempre o endereço. Alterações <b>ficam</b> no main (P1, P2, P3).</li>
+<li><b>Ponteiro</b> (<code>f(&amp;k)</code> + <code>int *c</code>) → alterações com <code>*c</code> ou <code>-&gt;</code> <b>ficam</b> (P4, P6).</li>
+<li><b>return</b> só altera se o main guardar: <code>k = f(v,k);</code> muda k; <code>f(v,k);</code> não muda (P8 vs Extra 7).</li></ul>`],
+["2. Ponto vs seta", C`<ul>
+<li>Variável struct: <code>dados.campo</code></li>
+<li>Ponteiro para struct: <code>dados-&gt;campo</code> ≡ <code>(*dados).campo</code></li>
+<li><code>*dados.campo</code> está <b>errado</b> (o ponto tem prioridade sobre <code>*</code>).</li>
+<li>Vetor de structs: <code>vetor[i].campo</code>; endereço de um elemento: <code>&amp;vetor[i]</code>.</li>
+<li>Endereço de um campo através de ponteiro: <code>&amp;dados-&gt;dataVenda</code>.</li></ul>`],
+["3. Ponteiros para int", C`Com <code>int *q</code>:<ul>
+<li><code>q</code> = endereço · <code>*q</code> = valor · <code>&amp;(*q)</code> = <code>q</code></li>
+<li><code>*q = 0;</code> põe o valor a 0 ✔ — <code>q = 0;</code> estraga o ponteiro ✘</li>
+<li><code>&amp;q</code> é o endereço do ponteiro (quase sempre errado em fread).</li></ul>`],
+["4. Contas e printf", C`<ul>
+<li><code>int / int</code> = divisão inteira: 16/3 = 5. Guardar num float não recupera: dá 5.00.</li>
+<li>Para divisão real: <code>(float)a / b</code> ou usar um literal decimal.</li>
+<li><code>%</code> = resto: 16 % 3 = 1, 23 % 5 = 3.</li>
+<li><code>%.2f</code> mostra <b>sempre</b> 2 casas e arredonda: 9.1 → 9.10, 0.425 → 0.43, 91 → 91.00.</li>
+<li>Ordem do output = ordem das chamadas a printf (atenção a quem imprime primeiro!).</li>
+<li>Repara onde está o <code>\n</code> (no início ou no fim) para saber onde quebra a linha.</li></ul>`],
+["5. Ciclos e strings", C`<ul>
+<li>Depois de <code>for (j=1; j&lt;=n; j++)</code>, j vale <b>n+1</b> (P1: j=3).</li>
+<li><code>char v[10] = {'\0'};</code> → todas as posições a '\0'.</li>
+<li><code>strcpy(v, "teste")</code> escreve 5 letras + '\0'; <code>strcat</code> junta no fim.</li>
+<li>Listar/ler: ciclo até <b>quantidade</b>, nunca até MAX.</li></ul>`],
+["6. Funções de leitura (P10, P11, P14, P15)", C`Olha <b>sempre</b> para o protótipo:<ul>
+<li><code>tipoX lerX(void)</code> → <code>var = lerX();</code></li>
+<li><code>void lerX(tipoX *p)</code> → <code>lerX(&amp;var);</code></li>
+<li><code>tipoImovel obtemImovel(void)</code> → <code>vetor[i] = obtemImovel();</code></li>
+<li><code>void obtemImovel(tipoImovel *d)</code> → <code>obtemImovel(&amp;vetor[i]);</code></li>
+<li>Função que “obtém e devolve” com parâmetro <b>sem *</b> e tipo void → está errada (cópia perde-se).</li>
+<li>Strings (<code>char nome[50]</code>) passam-se sem &amp;: <code>lerString(d-&gt;nome, 50)</code>.</li></ul>`],
+["7. Ficheiros binários (P16–P18)", C`<pre class="code">FILE *fp;
+fp = fopen("FICH.DAT", "wb");        /* gravar: "wb" | ler: "rb" | acrescentar: "ab" */
+if (fp != NULL) {                    /* != NULL, nunca == NULL */
+    fwrite(&amp;quant, sizeof(int), 1, fp);       /* &amp; no int */
+    fwrite(vetor, sizeof(tipoX), quant, fp);     /* vetor sem & */
+    fclose(fp);
+}</pre>
+<ul><li>fread/fwrite(<b>endereço</b>, <b>tamanho de 1 elemento</b>, <b>quantos</b>, fp).</li>
+<li>"r"/"w" sem b = modo texto → errado para binário.</li>
+<li>Ler pela <b>mesma ordem</b> em que se gravou (quantidade primeiro).</li>
+<li>A quantidade lida devolve-se com <code>return</code> (função int) <b>ou</b> por ponteiro <code>int *q</code> com <code>*q</code>.</li></ul>`],
+["8. Declarar estruturas (P12)", C`<ul>
+<li>Data → struct própria <code>tipoData {dia, mes, ano}</code> (um mês só, não <code>mes[12]</code>).</li>
+<li>Texto → <code>char nome[N]</code> (não <code>char nome;</code>).</li>
+<li>No main: <code>tipoX vetor[MAX];</code> e contador <code>int quant = 0;</code></li></ul>`],
+["9. Estratégia para o “NÃO RESPONDER”", C`<ul>
+<li>Se há desconto por resposta errada, só “chutas” quando consegues eliminar pelo menos 2 opções.</li>
+<li>Nas perguntas de código, elimina primeiro pelos detalhes fáceis: modo "r"/"w" sem b, <code>== NULL</code>, <code>.</code> com ponteiro, <code>-&gt;</code> sem ponteiro, falta de &amp;.</li>
+<li>Nas de output, faz a tabela das variáveis à mão — e confirma se a função altera ou não o original.</li></ul>`]
+];
+(function(){
+  const s = $("#tab-cabula");
+  CABULA.forEach(([t, html]) => s.append(h("div", {class:"card"}, h("h2", {}, t), h("div", {html}))));
+})();
+
+/* ============================================================
+   INÍCIO
+   ============================================================ */
+renderCorrecao();
+checkResume();
+showTab(store.get("prog1_tab", "correcao"));
+</script>
+</body>
+</html>
