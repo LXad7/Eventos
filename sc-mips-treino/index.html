@@ -1,0 +1,1588 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SC · MIPS64 Treino</title>
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --surface2:#eef1f5; --text:#1b1f24; --muted:#5d6672;
+  --border:#d9dee5; --accent:#2457c5; --accent-weak:#e3ebfb;
+  --ok:#1d7a3e; --ok-bg:#e4f4ea; --bad:#b3261e; --bad-bg:#fbe8e6; --warn:#8a5a00; --warn-bg:#fdf1d8;
+  --code-bg:#f2f4f7; --radius:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121417; --surface:#1b1e23; --surface2:#23272e; --text:#e6e8eb; --muted:#9aa3ae;
+    --border:#30353d; --accent:#7aa2ff; --accent-weak:#1f2a44;
+    --ok:#5fd28a; --ok-bg:#16301f; --bad:#ff8a80; --bad-bg:#3a1a18; --warn:#f5c35b; --warn-bg:#3a2e12;
+    --code-bg:#15181c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121417; --surface:#1b1e23; --surface2:#23272e; --text:#e6e8eb; --muted:#9aa3ae;
+  --border:#30353d; --accent:#7aa2ff; --accent-weak:#1f2a44;
+  --ok:#5fd28a; --ok-bg:#16301f; --bad:#ff8a80; --bad-bg:#3a1a18; --warn:#f5c35b; --warn-bg:#3a2e12;
+  --code-bg:#15181c;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px 64px}
+header{padding:20px 0 8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+header h1{margin:0;font-size:1.4rem}
+header p{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.theme button{font:inherit;font-size:.85rem;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:6px;padding:4px 8px;cursor:pointer}
+.tabs{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;padding:10px 0;border-bottom:1px solid var(--border);overflow-x:auto}
+.tabs button{flex:0 0 auto;border:1px solid var(--border);background:var(--surface);color:var(--text);padding:8px 14px;border-radius:999px;font:inherit;font-size:.95rem;cursor:pointer}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+section.tab{display:none;padding-top:16px}
+section.tab.on{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:0 0 16px}
+.qhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+.qnum{font-weight:700}
+.chip{font-size:.75rem;padding:2px 8px;border-radius:999px;background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.chip-o{background:var(--accent-weak);color:var(--accent);border-color:transparent}
+.chip-n{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+pre{margin:0;font:13.5px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;white-space:pre;overflow-x:auto}
+pre.code{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin:8px 0}
+code{font:.9em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--surface2);padding:1px 4px;border-radius:4px}
+.fields{display:grid;gap:10px;margin-top:10px}
+.field{display:grid;gap:4px}
+.field .fl{font-size:.95rem}
+.field input[type=text],.field select{font:14px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:7px 9px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);width:100%;max-width:420px}
+.radios{display:grid;gap:8px}
+label.ans{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;background:var(--surface)}
+label.ans.sel{border-color:var(--accent);background:var(--accent-weak)}
+label.ans input{margin-top:4px}
+.sol{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;padding:8px 10px;border-radius:8px;background:var(--ok-bg);border:1px solid var(--ok)}
+.sol .k{font-size:.9rem}
+.sol .v{font:600 14px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--ok);white-space:pre-wrap}
+.sol.bad{background:var(--bad-bg);border-color:var(--bad)}
+.sol .mine{font:14px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--bad);white-space:pre-wrap}
+.sol .note{width:100%}
+.optlist{display:grid;gap:8px}
+.opt{display:flex;gap:10px;border:1px solid var(--border);border-radius:8px;padding:10px}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.chosen-bad{border-color:var(--bad);background:var(--bad-bg)}
+.opt .letter{flex:0 0 24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);font-weight:700;font-size:.8rem}
+.opt.ok .letter{background:var(--ok);color:var(--bg)}
+.exp{margin-top:12px;padding:12px;border-radius:8px;background:var(--surface2);font-size:.95rem}
+.exp strong:first-child{display:block;margin-bottom:4px}
+.exp ol,.exp ul{margin:6px 0;padding-left:20px}
+.hidden-sol .sol,.hidden-sol .exp,.hidden-sol .opt .why{display:none}
+.hidden-sol .opt.ok{border-color:var(--border);background:transparent}
+.hidden-sol .opt.ok .letter{background:var(--surface2);color:var(--text)}
+.reveal{display:none;margin-top:10px}
+.hidden-sol .reveal{display:inline-block}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:14px}
+.toolbar label{display:flex;gap:6px;align-items:center;font-size:.95rem}
+select,input[type=number]{font:inherit;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text)}
+.btn{font:inherit;border:1px solid var(--accent);background:var(--accent);color:var(--bg);padding:9px 16px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.danger{border-color:var(--bad);background:transparent;color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:default}
+.form{display:grid;gap:12px;max-width:520px}
+.form label{display:grid;gap:4px;font-size:.95rem}
+.form .row{display:flex;gap:8px;align-items:center}
+.note{font-size:.88rem;color:var(--muted)}
+.banner{border:1px solid var(--warn);background:var(--warn-bg);border-radius:8px;padding:12px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.runbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;flex-wrap:wrap}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--surface2)}
+.timer.low{background:var(--bad-bg);color:var(--bad)}
+.navrow{display:flex;justify-content:space-between;gap:8px;margin:12px 0}
+.grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.grid button{width:38px;height:38px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-size:.85rem;cursor:pointer}
+.grid button.done{background:var(--surface2);border-color:var(--muted)}
+.grid button.cur{outline:2px solid var(--accent);outline-offset:1px}
+.grid button.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.grid button.part{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+.grid button.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:10px 0 16px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px}
+.stat .v{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .l{font-size:.82rem;color:var(--muted)}
+.stat.ok .v{color:var(--ok)} .stat.bad .v{color:var(--bad)}
+table{border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:6px 8px;border:1px solid var(--border)}
+th{background:var(--surface2);font-weight:600}
+.tablewrap{overflow-x:auto;margin:8px 0}
+.mat h2{font-size:1.15rem;margin:0 0 8px}
+.mat h3{font-size:1rem;margin:14px 0 6px}
+.mat p,.mat li{font-size:.97rem}
+.mat ul,.mat ol{padding-left:20px;margin:6px 0}
+.toc{columns:2;column-gap:24px;padding-left:20px;margin:0}
+.toc a{color:var(--accent)}
+@media (max-width:600px){.toc{columns:1}}
+.tip{border-left:4px solid var(--accent);background:var(--accent-weak);padding:8px 12px;border-radius:6px;margin:10px 0;font-size:.95rem}
+.trap{border-left:4px solid var(--bad);background:var(--bad-bg);padding:8px 12px;border-radius:6px;margin:10px 0;font-size:.95rem}
+.hist td,.hist th{border:none;border-bottom:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Sistemas Computacionais · MIPS64</h1>
+    <p>Treino offline — matéria explicada (exercícios 5 a 9), correção do teste de treino, perguntas novas e o guia de consulta.</p>
+  </div>
+  <div class="theme"><button id="themeBtn" type="button">Tema</button></div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="materia" class="on">Matéria</button>
+  <button data-tab="correcao">Correção</button>
+  <button data-tab="teste">Fazer teste</button>
+  <button data-tab="guia">Guia de consulta</button>
+  <button data-tab="historico">Histórico</button>
+</nav>
+
+<!-- ======================= MATÉRIA ======================= -->
+<section class="tab on mat" id="tab-materia">
+<div class="card">
+  <h2>Índice</h2>
+  <ol class="toc">
+    <li><a href="#m1">Registos e instruções básicas</a></li>
+    <li><a href="#m2">Segmento de dados: diretivas e tamanhos</a></li>
+    <li><a href="#m3">Como a memória fica arrumada (janela Data)</a></li>
+    <li><a href="#m4">Load / Store e endereçamento</a></li>
+    <li><a href="#m5">Vetores (Ex. 8)</a></li>
+    <li><a href="#m6">Entrada/Saída: CR e DR (Ex. 5)</a></li>
+    <li><a href="#m7">Saltos e estruturas de controlo (Ex. 5 e 6)</a></li>
+    <li><a href="#m8">Operações lógicas e máscaras (Ex. 7a)</a></li>
+    <li><a href="#m9">Endereços IP e máscaras de rede (Ex. 7b)</a></li>
+    <li><a href="#m10">Strings e ASCII (Ex. 9)</a></li>
+    <li><a href="#m11">Como responder às perguntas do teste</a></li>
+  </ol>
+</div>
+
+<div class="card" id="m1">
+<h2>1. Registos e instruções básicas</h2>
+<ul>
+<li>32 registos inteiros de <b>64 bits</b>: <code>r0</code> … <code>r31</code>. <b><code>r0</code> vale sempre 0</b> (escrever nele não faz nada).</li>
+<li><code>r31</code> guarda o endereço de retorno do <code>jal</code>. <code>r29</code> costuma ser o ponteiro da pilha.</li>
+<li>Instruções começadas por <b>d</b> trabalham com 64 bits (<i>doubleword</i>): <code>dadd</code>, <code>daddi</code>, <code>dsub</code>, <code>dmul</code>.</li>
+</ul>
+<div class="tablewrap"><table>
+<tr><th>Instrução</th><th>Faz</th></tr>
+<tr><td><code>daddi r1,r2,100</code></td><td>r1 = r2 + 100 (imediato de 16 bits <b>com sinal</b>: −32768 … 32767)</td></tr>
+<tr><td><code>daddi r1,r0,5</code></td><td>r1 = 5 (é assim que se põe uma constante num registo)</td></tr>
+<tr><td><code>daddi r4,r0,Msg</code></td><td>r4 = <b>endereço</b> da etiqueta Msg (não o conteúdo!)</td></tr>
+<tr><td><code>dadd r1,r2,r3</code> / <code>dsub</code></td><td>r1 = r2 + r3 / r1 = r2 − r3</td></tr>
+<tr><td><code>dmul r1,r2,r3</code></td><td>r1 = r2 × r3</td></tr>
+<tr><td><code>slt r1,r2,r3</code></td><td>se r2 &lt; r3 então r1 = 1, senão r1 = 0</td></tr>
+<tr><td><code>slti r1,r2,20</code></td><td>se r2 &lt; 20 então r1 = 1, senão r1 = 0</td></tr>
+<tr><td><code>and/or/xor r1,r2,r3</code></td><td>operação lógica bit a bit entre registos</td></tr>
+<tr><td><code>andi/ori/xori r1,r2,imm</code></td><td>operação lógica com imediato de 16 bits (preenchido com zeros à esquerda)</td></tr>
+<tr><td><code>dsll / dsrl r1,r2,n</code></td><td>desloca n bits para a esquerda (×2ⁿ) / direita (÷2ⁿ)</td></tr>
+<tr><td><code>halt</code></td><td>termina o programa</td></tr>
+</table></div>
+<div class="tip"><b>Exemplo (P11 do treino):</b> <code>daddi r1,r0,1 · daddi r2,r0,2 · daddi r3,r0,3 · slt r1,r3,r2</code> → 3 &lt; 2 é falso, logo <b>r1 = 0</b>. Final: r0=0, r1=0, r2=2, r3=3.</div>
+</div>
+
+<div class="card" id="m2">
+<h2>2. Segmento de dados: diretivas e tamanhos</h2>
+<p>O programa tem duas partes: <code>.data</code> (variáveis) e <code>.code</code> / <code>.text</code> (instruções).</p>
+<div class="tablewrap"><table>
+<tr><th>Diretiva</th><th>Cada valor ocupa</th><th>Exemplo</th><th>Tamanho total</th></tr>
+<tr><td><code>.word</code></td><td>8 bytes (64 bits)</td><td><code>.word 234,-2,17,0x45ABC</code></td><td>4 × 8 = <b>32</b></td></tr>
+<tr><td><code>.word32</code></td><td>4 bytes</td><td><code>.word32 7, 8</code></td><td>2 × 4 = <b>8</b></td></tr>
+<tr><td><code>.word16</code></td><td>2 bytes</td><td><code>.word16 1,2,3</code></td><td>3 × 2 = <b>6</b></td></tr>
+<tr><td><code>.byte</code></td><td>1 byte</td><td><code>.byte 1,2,3,4,5</code></td><td><b>5</b></td></tr>
+<tr><td><code>.asciiz "..."</code></td><td>1 byte por letra <b>+ 1</b> (o <code>\0</code> final)</td><td><code>.asciiz "Arquitetura"</code></td><td>11 + 1 = <b>12</b></td></tr>
+<tr><td><code>.ascii "..."</code></td><td>1 byte por letra (sem terminador)</td><td><code>.ascii "Sun"</code></td><td><b>3</b></td></tr>
+<tr><td><code>.space n</code></td><td>reserva n bytes</td><td><code>.space 100</code></td><td><b>100</b></td></tr>
+<tr><td><code>.double</code></td><td>8 bytes (vírgula flutuante)</td><td><code>.double 3.14</code></td><td>8</td></tr>
+</table></div>
+<div class="trap"><b>Ratoeiras:</b> <code>.word</code> no MIPS64 são <b>64 bits</b> (não 32!). <code>.asciiz</code> conta o <code>\0</code>; <code>.ascii</code> não. Espaços e pontuação também são caracteres.</div>
+</div>
+
+<div class="card" id="m3">
+<h2>3. Como a memória fica arrumada (janela Data)</h2>
+<ol>
+<li><b>Cada linha de diretiva começa num endereço múltiplo de 8.</b> Se a anterior não acabou num múltiplo de 8, o resto fica vazio.</li>
+<li>Os valores dentro da mesma diretiva ficam seguidos (juntos).</li>
+<li>O MIPS é <b>little endian</b>: o byte <b>menos</b> significativo fica no endereço <b>mais baixo</b>.</li>
+<li>A janela Data mostra 8 bytes por linha, lidos <b>da direita para a esquerda</b> (o byte do endereço mais baixo está à direita).</li>
+</ol>
+<pre class="code">.data
+Text: .asciiz "Arquitectura"   ; 13 bytes: endereços 0..12
+CR:   .word32 0x10000          ; próximo múltiplo de 8 → endereço 16 (0x10)
+DR:   .word32 0x10008          ; endereço 24 (0x18)</pre>
+<h3>Ler um vetor de .word16 na janela Data (P12 do treino)</h3>
+<pre class="code">0010 00070064000f0003   V: .word16 3, 15, 100, 7, 0xf5aa, 17, 5, 15, -100, 2023
+0018 000f00050011f5aa
+0020 0000000007e7ff9c</pre>
+<p>Na linha 0x10, partindo da <b>direita</b>, em grupos de 4 dígitos hex (2 bytes): <code>0003</code>=V[0]=3, <code>000f</code>=V[1]=15, <code>0064</code>=V[2]=100, <code>0007</code>=V[3]=7. Na linha 0x18: <code>f5aa</code>=V[4], <code>0011</code>=V[5]=17 … Na linha 0x20: <code>ff9c</code>=−100 e <code>07e7</code>=2023.</p>
+<div class="tip">Endereço do elemento: <b>endereço(V[i]) = endereço(V) + i × tamanho</b>. Ex.: V em 0x10, .word16 → V[3] está em 0x10 + 3×2 = <b>0x16</b> (22).</div>
+<h3>Little endian com .byte (Ex. 7b1)</h3>
+<p>Para guardar o IP 192.168.10.15 de modo que, lido como 32 bits, dê 0xC0A80A0F, declara-se ao contrário: <code>IP: .byte 15,10,168,192</code> (o 15 fica no endereço 0, o 192 no endereço 3). Equivalente: <code>IP: .word32 0xC0A80A0F</code>.</p>
+<div class="tip">No Ex. 8b, os 10 valores <code>.word16</code> devem estar <b>todos na mesma linha</b> (ou 4 por linha = 8 bytes), senão cada nova linha salta para o próximo múltiplo de 8 e o vetor fica com buracos.</div>
+</div>
+
+<div class="card" id="m4">
+<h2>4. Load / Store e endereçamento</h2>
+<div class="tablewrap"><table>
+<tr><th>Ler (memória → registo)</th><th>Escrever (registo → memória)</th><th>Bytes</th></tr>
+<tr><td><code>ld</code></td><td><code>sd</code></td><td>8 (.word)</td></tr>
+<tr><td><code>lw</code> (com sinal) / <code>lwu</code> (sem sinal)</td><td><code>sw</code></td><td>4 (.word32)</td></tr>
+<tr><td><code>lh</code> / <code>lhu</code></td><td><code>sh</code></td><td>2 (.word16)</td></tr>
+<tr><td><code>lb</code> / <code>lbu</code></td><td><code>sb</code></td><td>1 (.byte, caracteres)</td></tr>
+</table></div>
+<p><b>Formato:</b> <code>ld r1, Etiqueta(rX)</code> → lê do endereço <b>Etiqueta + rX</b>.</p>
+<ul>
+<li><code>ld r1, A(r0)</code> → lê a variável A (r0 = 0).</li>
+<li><code>ld r1, V(r8)</code> → lê de V + r8 (r8 = deslocamento em <b>bytes</b>).</li>
+<li><code>ld r1, (r2)</code> → lê do endereço guardado em r2.</li>
+<li><code>sd r4, s(r5)</code> → escreve r4 em s + r5.</li>
+</ul>
+<div class="tip"><b>P6/P9 do treino:</b> <code>daddi r4,r0,16 · daddi r5,r0,8 · sd r4,s(r5)</code> com s um vetor de .word (8 bytes): deslocamento 8 bytes ÷ 8 = índice <b>1</b> (o 2.º elemento). Valor enviado para a memória: <b>16</b>.</div>
+<div class="trap"><b>Deslocamento ≠ índice.</b> O valor dentro dos parênteses é em <b>bytes</b>. Para o índice i: deslocamento = i × tamanho do elemento (8 para .word, 4 para .word32, 2 para .word16, 1 para .byte).</div>
+<p><b>lw vs lwu:</b> <code>lw</code> estende o sinal (se o bit 31 for 1, os 32 bits de cima ficam a 1); <code>lwu</code> enche com zeros. O mesmo para <code>lb</code>/<code>lbu</code>: o byte 200 (0xC8) lido com <code>lb</code> dá −56; com <code>lbu</code> dá 200. Para CR e DR usa-se <code>lwu</code>.</p>
+</div>
+
+<div class="card" id="m5">
+<h2>5. Vetores (Ex. 8)</h2>
+<p><b>Regra:</b> <code>Vetor[i]</code> em C = <code>Vetor(i × tamanho)</code> em MIPS.</p>
+<pre class="code">.data
+Vetor: .word 3, 15, 100, 7, 0xF9876543987625aa
+       .word 17, 5, 15, -100, 2023      ; 10 inteiros de 64 bits = 80 bytes
+VLen:  .word 10
+CR:    .word32 0x10000
+DR:    .word32 0x10008
+.code
+       lwu r2,DR(r0)
+       lwu r1,CR(r0)
+       ld r10,VLen(r0)       ; r10 = tamanho
+       daddi r5,r0,0         ; i = 0
+For:   slt r3,r5,r10         ; i &lt; VLen ?
+       beqz r3,FimFor        ; se não, sai
+       daddi r3,r0,8         ; 8 bytes por elemento
+       dmul r8,r5,r3         ; r8 = i*8
+       ld r4,Vetor(r8)       ; r4 = Vetor[i]
+       sd r4,(r2)            ; DATA = r4
+       daddi r3,r0,2         ; código 2 = inteiro com sinal
+       sd r3,(r1)            ; CONTROL = 2 → mostra
+       daddi r5,r5,1         ; i++
+       j For
+FimFor:
+; Somar 1 ao 4.º elemento (índice 3 → byte 24)
+       daddi r5,r0,3
+       daddi r3,r0,8
+       dmul r8,r5,r3         ; r8 = 24
+       ld r4,Vetor(r8)
+       daddi r4,r4,1
+       sd r4,Vetor(r8)
+       halt</pre>
+<p><b>Ex. 8b (inteiros de 16 bits):</b> só mudam 3 coisas: <code>.word16</code> na declaração, <b>2</b> em vez de 8 no tamanho, e <code>lh</code>/<code>sh</code> em vez de <code>ld</code>/<code>sd</code>. O 4.º elemento fica no byte 3 × 2 = 6.</p>
+<div class="trap">"4.º elemento" = índice <b>3</b> (começa em 0). Lê sempre com atenção se a pergunta conta a partir de 0 ou de 1.</div>
+</div>
+
+<div class="card" id="m6">
+<h2>6. Entrada/Saída: CR e DR (Ex. 5)</h2>
+<p>O terminal controla-se escrevendo em dois endereços especiais: <b>CONTROL = 0x10000</b> e <b>DATA = 0x10008</b>.</p>
+<pre class="code">.data
+CR: .word32 0x10000
+DR: .word32 0x10008
+.code
+lwu r1,CR(r0)   ; r1 = 0x10000 (endereço do CONTROL)
+lwu r2,DR(r0)   ; r2 = 0x10008 (endereço do DATA)</pre>
+<div class="tablewrap"><table>
+<tr><th>Código em CONTROL</th><th>Efeito</th></tr>
+<tr><td>1</td><td>mostra DATA como inteiro sem sinal</td></tr>
+<tr><td>2</td><td>mostra DATA como inteiro com sinal</td></tr>
+<tr><td>3</td><td>mostra DATA como vírgula flutuante</td></tr>
+<tr><td>4</td><td>mostra a <b>string</b> cujo endereço está em DATA</td></tr>
+<tr><td>5</td><td>pixel RGB (gráficos)</td></tr>
+<tr><td>6</td><td>limpa o terminal</td></tr>
+<tr><td>7</td><td>limpa o ecrã gráfico</td></tr>
+<tr><td>8</td><td><b>lê</b> um inteiro (ou float) do teclado para DATA</td></tr>
+<tr><td>9</td><td>lê um byte (carácter) para DATA, sem eco</td></tr>
+</table></div>
+<h3>Os 4 padrões que tens de saber de cor</h3>
+<pre class="code">; Mostrar string Msg              ; Mostrar inteiro em r4
+daddi r4,r0,Msg   ; endereço         sd r4,(r2)        ; DATA = r4
+sd r4,(r2)        ; DATA = end.      daddi r3,r0,2
+daddi r3,r0,4                        sd r3,(r1)        ; CONTROL = 2
+sd r3,(r1)        ; CONTROL = 4
+
+; Ler inteiro para r4             ; Limpar terminal
+daddi r3,r0,8                        daddi r3,r0,6
+sd r3,(r1)        ; CONTROL = 8      sd r3,(r1)
+ld r4,(r2)        ; r4 = DATA</pre>
+<div class="tip"><b>Ordem:</b> para mostrar, primeiro põe-se o valor em DATA e só depois o código em CONTROL (é a escrita em CONTROL que dispara a ação). Para ler, primeiro o código 8 em CONTROL e depois lê-se DATA.</div>
+<div class="trap">Para mostrar string usa-se <code>daddi r3,r0,Msg</code> (o <b>endereço</b>), não <code>ld</code>. A string tem de ter <code>\0</code> no fim (<code>.asciiz</code>). As strings mostradas seguidas aparecem coladas (P4: "Bom" + "Dia" = <b>BomDia</b>).</div>
+</div>
+
+<div class="card" id="m7">
+<h2>7. Saltos e estruturas de controlo (Ex. 5 e 6)</h2>
+<div class="tablewrap"><table>
+<tr><th>Instrução</th><th>Salta para a etiqueta se…</th></tr>
+<tr><td><code>beq r1,r2,L</code></td><td>r1 = r2</td></tr>
+<tr><td><code>bne r1,r2,L</code></td><td>r1 ≠ r2</td></tr>
+<tr><td><code>beqz r1,L</code></td><td>r1 = 0</td></tr>
+<tr><td><code>bnez r1,L</code></td><td>r1 ≠ 0</td></tr>
+<tr><td><code>j L</code></td><td>sempre</td></tr>
+<tr><td><code>jal L</code> / <code>jr r31</code></td><td>chama rotina (guarda retorno em r31) / volta</td></tr>
+</table></div>
+<p><b>Truque principal:</b> em assembly testa-se a condição <b>contrária</b> para <b>saltar por cima</b> do código.</p>
+<div class="tablewrap"><table>
+<tr><th>C</th><th>MIPS</th></tr>
+<tr><td>if (r1 == r2) op1;</td><td><pre>bne r1,r2,NaoFaz
+op1
+NaoFaz:</pre></td></tr>
+<tr><td>if (r1 &lt; r2) op1;</td><td><pre>slt r3,r1,r2
+beqz r3,NaoFaz
+op1
+NaoFaz:</pre></td></tr>
+<tr><td>if (r1 &gt;= r2) op1;</td><td><pre>slt r3,r1,r2
+bnez r3,NaoFaz
+op1
+NaoFaz:</pre></td></tr>
+<tr><td>if (r1 &gt; r2) op1;</td><td><pre>slt r3,r2,r1
+beqz r3,NaoFaz
+op1
+NaoFaz:</pre></td></tr>
+<tr><td>if (r1 == r2) op1; else op2;</td><td><pre>bne r1,r2,Else
+op1
+j FimSe
+Else:
+op2
+FimSe:</pre></td></tr>
+<tr><td>while (r1 != r2) op1;</td><td><pre>While:
+beq r1,r2,FimWhile
+op1
+j While
+FimWhile:</pre></td></tr>
+<tr><td>for (r5=0; r5&lt;r6; r5++) op1;</td><td><pre>daddi r5,r0,0
+For:
+slt r1,r5,r6
+beqz r1,FimFor
+op1
+daddi r5,r5,1
+j For
+FimFor:</pre></td></tr>
+</table></div>
+<h3>Ex. 5c — mostrar o maior de a (r5) e b (r6)</h3>
+<pre class="code">       bne r5,r6,Diferentes
+       ... mostra "Iguais!" ...
+       j Fim                 ; sem isto também executava o "maior"!
+Diferentes:
+       dadd r7,r5,r0         ; max = a
+       slt r3,r5,r6          ; a &lt; b ?
+       beq r3,r0,MaxA        ; se não, max fica a
+       dadd r7,r6,r0         ; senão max = b
+MaxA:  ... mostra "O maior é: " e r7 ...
+Fim:   halt</pre>
+<h3>Ex. 6 — jogo de adivinhar (repetir até acertar)</h3>
+<pre class="code">       daddi r6,r0,0         ; Acertou = 0
+       daddi r3,r0,0         ; NTentativas = 0
+Repetir:
+       daddi r3,r3,1         ; NTentativas++
+       ... ler Tentativa para r5 (código 8) ...
+       bne r4,r5,Diferentes  ; r4 = segredo
+       ... "Parabéns!" ...
+       daddi r6,r0,1         ; Acertou = 1
+       j Continua
+Diferentes:
+       slt r7,r5,r4          ; tentativa &lt; segredo ?
+       beqz r7,SegredoMenor
+       ... "O segredo é maior" ...
+       j Continua
+SegredoMenor:
+       ... "O segredo é menor" ...
+Continua:
+       beqz r6,Repetir       ; enquanto não acertou</pre>
+<div class="trap">Atenção ao <code>j</code> no fim do bloco "então": sem ele, o programa continua a correr para dentro do "senão". E <code>beq r1,r0,X</code> com r1 = 0x10000 (endereço do CR) <b>nunca</b> salta (P4).</div>
+</div>
+
+<div class="card" id="m8">
+<h2>8. Operações lógicas e máscaras (Ex. 7a)</h2>
+<p>Cada bit representa uma porta (bit 0 à direita). Convenção: <b>0 = aberta, 1 = fechada</b>.</p>
+<div class="tablewrap"><table>
+<tr><th>Quero…</th><th>Operação</th><th>Máscara</th><th>Porquê</th></tr>
+<tr><td><b>pôr a 1</b> (fechar)</td><td><code>OR</code> / <code>ori</code></td><td>1 nos bits a mudar, 0 no resto</td><td>x OR 1 = 1; x OR 0 = x</td></tr>
+<tr><td><b>pôr a 0</b> (abrir)</td><td><code>AND</code> / <code>andi</code></td><td><b>0</b> nos bits a mudar, 1 no resto</td><td>x AND 0 = 0; x AND 1 = x</td></tr>
+<tr><td><b>inverter</b> (trocar estado)</td><td><code>XOR</code> / <code>xori</code></td><td>1 nos bits a mudar, 0 no resto</td><td>x XOR 1 = não x; x XOR 0 = x</td></tr>
+</table></div>
+<h3>Como calcular a máscara em hexadecimal</h3>
+<ol>
+<li>Escreve os bits das portas a mudar: portas 2 e 15 → bit 2 = 0x0004, bit 15 = 0x8000 → <b>0x8004</b>.</li>
+<li>Para OR/XOR a máscara é essa: fechar portas 2 e 15 → <code>ori r7,r7,0x8004</code> (P7).</li>
+<li>Para AND inverte-se tudo: abrir porta 2 em 8 bits → 1111 1011 = <b>0xFB</b> → <code>andi r1,r1,0xFB</code>.</li>
+</ol>
+<div class="tablewrap"><table>
+<tr><th>bit</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+<tr><th>valor</th><td>0x1</td><td>0x2</td><td>0x4</td><td>0x8</td><td>0x10</td><td>0x20</td><td>0x40</td><td>0x80</td></tr>
+<tr><th>bit</th><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td></tr>
+<tr><th>valor</th><td>0x100</td><td>0x200</td><td>0x400</td><td>0x800</td><td>0x1000</td><td>0x2000</td><td>0x4000</td><td>0x8000</td></tr>
+<tr><th>bit</th><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>…</td><td>24</td><td>31</td></tr>
+<tr><th>valor</th><td>0x10000</td><td>0x20000</td><td>0x40000</td><td>0x80000</td><td>0x100000</td><td>…</td><td>0x1000000</td><td>0x80000000</td></tr>
+</table></div>
+<h3>Ex. 7a resolvido (8 portas, estado inicial portas 0 e 5 abertas)</h3>
+<pre class="code">daddi r1,r0,0xDE   ; 1101 1110 → portas 0 e 5 abertas (a 0)
+andi r1,r1,0xFB    ; abrir porta 2:  máscara 1111 1011 → 1101 1010
+ori  r1,r1,0x20    ; fechar porta 5: máscara 0010 0000 → 1111 1010
+xori r1,r1,0x06    ; trocar 1 e 2:   máscara 0000 0110 → 1111 1100</pre>
+<h3>Máscaras com mais de 16 bits (P8)</h3>
+<p>Os imediatos de <code>andi/ori/xori</code> só têm <b>16 bits</b>. Para mexer em bits acima do 15 (ex.: porta 19), declara-se a máscara em memória e usa-se a versão com registos:</p>
+<pre class="code">Mask: .word32 0xFFF7FFFB   ; abrir portas 2 e 19: tudo a 1 exceto bits 2 e 19
+...
+lw  r8,Mask(r0)            ; lw estende o sinal: os bits de cima também ficam a 1
+and r7,r7,r8</pre>
+<p>Cálculo: bit 2 = 0x4, bit 19 = 0x80000 → 0x00080004 → invertido em 32 bits = <b>0xFFF7FFFB</b>.</p>
+<div class="trap">AND precisa da máscara <b>invertida</b> (0 onde queres apagar). OR e XOR usam a máscara "direta". Na P1: <code>0x2745 XOR 0x0500 = 0x2245</code>; <code>0x2245 OR 0xF000 = 0xF245</code>.</div>
+</div>
+
+<div class="card" id="m9">
+<h2>9. Endereços IP e máscaras de rede (Ex. 7b)</h2>
+<ul>
+<li>IPv4 = 32 bits = 4 octetos. 192.168.10.15 = C0.A8.0A.0F (hex).</li>
+<li>Máscara /25 = 25 bits a 1 + 7 a 0 = 255.255.255.128 = <b>0xFFFFFF80</b>.</li>
+<li><b>Endereço de rede</b> (parte host a 0) = IP <b>AND</b> máscara → 192.168.10.0.</li>
+<li><b>Broadcast</b> (parte host a 1) = IP <b>OR</b> máscara invertida (0x0000007F) → 192.168.10.127.</li>
+</ul>
+<pre class="code">.data
+IP:       .byte 15,10,168,192      ; 192.168.10.15 em little endian
+Mask_25:  .word32 0xFFFFFF80
+Mask_inv: .word32 0x0000007F
+.code
+lw  r1,IP(r0)
+lw  r8,Mask_25(r0)
+and r1,r1,r8          ; rede: 192.168.10.0
+lw  r8,Mask_inv(r0)
+or  r1,r1,r8          ; broadcast: 192.168.10.127</pre>
+<div class="tablewrap"><table>
+<tr><th>/n</th><th>Último octeto da máscara</th><th>Máscara (hex)</th><th>Invertida</th></tr>
+<tr><td>/24</td><td>0 (0000 0000)</td><td>0xFFFFFF00</td><td>0x000000FF</td></tr>
+<tr><td>/25</td><td>128 (1000 0000)</td><td>0xFFFFFF80</td><td>0x0000007F</td></tr>
+<tr><td>/26</td><td>192 (1100 0000)</td><td>0xFFFFFFC0</td><td>0x0000003F</td></tr>
+<tr><td>/27</td><td>224 (1110 0000)</td><td>0xFFFFFFE0</td><td>0x0000001F</td></tr>
+<tr><td>/28</td><td>240 (1111 0000)</td><td>0xFFFFFFF0</td><td>0x0000000F</td></tr>
+</table></div>
+<p>As máscaras de 32 bits não cabem num imediato de 16 bits → por isso usa-se <code>.word32</code> + <code>lw</code> + <code>and</code>/<code>or</code> (com registos).</p>
+</div>
+
+<div class="card" id="m10">
+<h2>10. Strings e ASCII (Ex. 9)</h2>
+<div class="tablewrap"><table>
+<tr><th>Carácter</th><td>'\0'</td><td>Enter</td><td>Espaço</td><td>'0'…'9'</td><td>'A'…'Z'</td><td>'a'…'z'</td></tr>
+<tr><th>Código</th><td>0</td><td>13</td><td>32 (0x20)</td><td>48…57</td><td>65…90</td><td>97…122</td></tr>
+</table></div>
+<ul>
+<li>Cada carácter ocupa 1 byte → lê-se com <code>lb</code> e escreve-se com <code>sb</code>; o índice i é diretamente o deslocamento.</li>
+<li>Maiúscula = minúscula − <b>32</b> ('a' 97 − 'A' 65 = 32).</li>
+<li>Valor de um dígito = código − <b>48</b> ('7' = 55 → 7).</li>
+</ul>
+<h3>9a1 — contar caracteres</h3>
+<pre class="code">       daddi r4,r0,0          ; i = 0
+While: lb r3,String(r4)       ; r3 = String[i]
+       beqz r3,FimWhile       ; '\0' → fim
+       daddi r4,r4,1          ; i++
+       j While
+FimWhile:                     ; r4 = n.º de caracteres</pre>
+<p>Esta é a <b>P3</b> do treino: a linha em falta é <code>lb r3,String(r4)</code>. Para "123456" dá r4 = 6.</p>
+<h3>9a2 — contar espaços</h3>
+<pre class="code">       daddi r6,r0,0x20       ; espaço
+While: lb r3,String(r4)
+       beqz r3,FimWhile
+       bne r3,r6,NaoEspaco    ; se não é espaço, não conta
+       daddi r5,r5,1          ; conta++
+NaoEspaco:
+       daddi r4,r4,1
+       j While</pre>
+<h3>9b — minúsculas para maiúsculas</h3>
+<pre class="code">While: lb r4,String(r5)
+       beqz r4,FimWhile
+       slti r3,r4,97          ; c &lt; 'a' ?
+       bnez r3,NaoConverte
+       slti r3,r4,123         ; c &lt;= 'z' ?  (c &lt; 123)
+       beqz r3,NaoConverte
+       daddi r4,r4,-32        ; maiúscula
+       sb r4,String(r5)       ; guarda na string
+NaoConverte:
+       daddi r5,r5,1
+       j While</pre>
+<p>Para um só carácter lido do teclado: código <b>9</b> em CONTROL, <code>lb r4,(r2)</code>, <code>daddi r4,r4,-32</code>, <code>sb r4,String(r0)</code> e mostrar com código 4.</p>
+<h3>9c — string de dígitos para inteiro ("7109" → 7109)</h3>
+<pre class="code">       daddi r6,r0,0          ; total = 0
+       daddi r10,r0,10
+While: lb r4,String(r5)
+       beqz r4,FimWhile
+       dmul r6,r6,r10         ; total *= 10
+       daddi r4,r4,-48        ; valor do dígito
+       dadd r6,r6,r4          ; total += dígito
+       daddi r5,r5,1
+       j While</pre>
+<p>Iterações: 0→7 → 71 → 710 → 7109.</p>
+<div class="trap">Escrever <code>sb r0,Texto(r4)</code> põe um <code>\0</code> nessa posição: a string "acaba" aí quando é mostrada. Escrever um espaço (0x20) só troca a letra (P10: "Arquitectura" com espaço no índice 7 → <b>Arquite tura</b>).</div>
+</div>
+
+<div class="card" id="m11">
+<h2>11. Como responder às perguntas do teste</h2>
+<ul>
+<li><b>"Qual o valor final de…"</b> → faz uma tabela com os registos e atualiza linha a linha. Lembra-te que r0 é sempre 0.</li>
+<li><b>Hexadecimal</b>: converte para binário em grupos de 4 bits, faz AND/OR/XOR e volta a juntar.</li>
+<li><b>Tamanhos</b>: .word 8, .word32 4, .word16 2, .byte 1, .asciiz letras+1, .ascii letras, .space n.</li>
+<li><b>Endereços</b>: cada linha de diretiva começa num múltiplo de 8; endereço(V[i]) = V + i×tamanho.</li>
+<li><b>Valor de R3 em <code>sd R0,V(R3)</code></b>: é o deslocamento em bytes = índice × tamanho (não o endereço completo!).</li>
+<li><b>Output no terminal</b>: segue os saltos; as strings saem coladas; um <code>\0</code> corta a string.</li>
+<li><b>Instrução de máscara</b>: escolhe AND/OR/XOR, calcula a máscara, escreve sem espaços desnecessários, ex. <code>ori r7,r7,0x8004</code>.</li>
+<li><b>Mais de 16 bits</b>: máscara em <code>.word32</code>, carregar com <code>lw</code>, aplicar com <code>and</code>/<code>or</code>/<code>xor</code> entre registos.</li>
+</ul>
+</div>
+</section>
+
+<!-- ======================= CORREÇÃO ======================= -->
+<section class="tab" id="tab-correcao">
+  <div class="toolbar">
+    <label>Mostrar
+      <select id="f-src">
+        <option value="orig">Teste de treino (12)</option>
+        <option value="novo">Perguntas novas</option>
+        <option value="all">Todas</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="f-hide"> Esconder soluções (modo estudo)</label>
+  </div>
+  <div id="corr-list"></div>
+</section>
+
+<!-- ======================= TESTE ======================= -->
+<section class="tab" id="tab-teste">
+  <div id="t-resume"></div>
+  <div id="t-setup" class="card">
+    <h2 style="margin-top:0;font-size:1.15rem">Configurar teste</h2>
+    <div class="form">
+      <label>Perguntas
+        <select id="t-pool">
+          <option value="orig">As 12 do teste de treino</option>
+          <option value="novo">Só as perguntas novas</option>
+          <option value="mix" selected>12 aleatórias (de todas)</option>
+          <option value="all">Todas</option>
+        </select>
+      </label>
+      <label>Tempo limite (minutos, 0 = sem limite)
+        <input type="number" id="t-mins" min="0" max="300" value="60">
+      </label>
+      <label class="row"><input type="checkbox" id="t-shufq" checked> Baralhar a ordem das perguntas</label>
+      <p class="note" style="margin:0">Cada pergunta vale 1 valor, dividido pelas caixas que tem (como no Moodle). As respostas numéricas aceitam decimal ou hexadecimal (0x…). Nas instruções, maiúsculas/minúsculas e espaços não contam.</p>
+      <div><button class="btn" id="t-start" type="button">Começar teste</button></div>
+    </div>
+  </div>
+  <div id="t-run" hidden></div>
+  <div id="t-result" hidden></div>
+</section>
+
+<!-- ======================= GUIA ======================= -->
+<section class="tab mat" id="tab-guia">
+<div class="card">
+<h2>Guia de consulta para os testes</h2>
+<p class="note">Transcrição da folha de consulta do IPL (Sistemas Computacionais — Nuno Veiga, Rui Vasco).</p>
+<h3>Taxa de Transferência de Dados (TTD) e Largura de Banda (LB)</h3>
+<p>LB = Largura de Dados × TTD = Largura de Dados × Frequência × N.º Transf. por ciclo relógio (b/s)</p>
+<h3>Evolução do socket para as últimas microarquiteturas Intel</h3>
+<div class="tablewrap"><table>
+<tr><th>Processadores Extreme</th><th>Restantes Gamas de Processadores</th></tr>
+<tr><td>Socket 1366</td><td>Socket 1156</td></tr>
+<tr><td>Socket 2011</td><td>Socket 1155</td></tr>
+<tr><td>Socket 2011-v3</td><td>Socket 1150</td></tr>
+<tr><td>Socket 2066</td><td>Socket 1151</td></tr>
+<tr><td>--</td><td>Socket 1200</td></tr>
+</table></div>
+<h3>Tabela ASCII</h3>
+<div class="tablewrap"><table>
+<tr><th>[ENTER]</th><th>Espaço</th><th>0 … 9</th><th>A … Z</th><th>a … z</th></tr>
+<tr><td>13</td><td>32</td><td>48 … 57</td><td>65 … 90</td><td>97 … 122</td></tr>
+<tr><td>dH</td><td>20H</td><td>30H … 39H</td><td>41H … 5aH</td><td>61H … 7aH</td></tr>
+</table></div>
+<h3>IEEE-754 (Precisão simples)</h3>
+<div class="tablewrap"><table>
+<tr><th>Sinal</th><th>Expoente</th><th>Mantissa</th></tr>
+<tr><td>1 bit</td><td>8 bits</td><td>23 bits</td></tr>
+</table></div>
+<h3>Lei de Amdahl</h3>
+<p>T<sub>novo</sub> = T<sub>anterior</sub> × ( Fração<sub>não melhorada</sub> + Fração<sub>melhorada</sub> / Speedup<sub>fração</sub> )</p>
+<p>Speedup<sub>global</sub> = 1 / ( Fração<sub>não melhorada</sub> + Fração<sub>melhorada</sub> / Speedup<sub>fração</sub> )</p>
+<h3>Assembler directives MIPS64</h3>
+<div class="tablewrap"><table>
+<tr><td><code>.data</code></td><td>start of data segment</td></tr>
+<tr><td><code>.text</code></td><td>start of code segment</td></tr>
+<tr><td><code>.code</code></td><td>start of code segment (same as .text)</td></tr>
+<tr><td><code>.org &lt;n&gt;</code></td><td>start address</td></tr>
+<tr><td><code>.space &lt;n&gt;</code></td><td>leave n empty bytes</td></tr>
+<tr><td><code>.asciiz &lt;s&gt;</code></td><td>enters zero terminated ascii string</td></tr>
+<tr><td><code>.ascii &lt;s&gt;</code></td><td>enter ascii string</td></tr>
+<tr><td><code>.align &lt;n&gt;</code></td><td>align to n-byte boundary</td></tr>
+<tr><td><code>.word &lt;n1&gt;,&lt;n2&gt;..</code></td><td>enters word(s) of data (64-bits)</td></tr>
+<tr><td><code>.byte &lt;n1&gt;,&lt;n2&gt;..</code></td><td>enter bytes</td></tr>
+<tr><td><code>.word32 &lt;n1&gt;,&lt;n2&gt;..</code></td><td>enters 32 bit number(s)</td></tr>
+<tr><td><code>.word16 &lt;n1&gt;,&lt;n2&gt;..</code></td><td>enters 16 bit number(s)</td></tr>
+<tr><td><code>.double &lt;n1&gt;,&lt;n2&gt;..</code></td><td>enters floating-point number(s)</td></tr>
+</table></div>
+<h3>Memory Mapped I/O area WinMIPS64</h3>
+<p><code>CONTROL: .word32 0x10000</code><br><code>DATA: .word32 0x10008</code></p>
+<ul>
+<li>Set CONTROL = 1, Set DATA to Unsigned Integer to be output</li>
+<li>Set CONTROL = 2, Set DATA to Signed Integer to be output</li>
+<li>Set CONTROL = 3, Set DATA to Floating Point to be output</li>
+<li>Set CONTROL = 4, Set DATA to address of string to be output</li>
+<li>Set CONTROL = 5, RGB colour output</li>
+<li>Set CONTROL = 6, Clears the terminal screen</li>
+<li>Set CONTROL = 7, Clears the graphics screen</li>
+<li>Set CONTROL = 8, read the DATA from the keyboard (either an integer or a floating-point)</li>
+<li>Set CONTROL = 9, read one byte from DATA, no character echo.</li>
+</ul>
+</div>
+</section>
+
+<section class="tab" id="tab-historico"><div id="hist"></div></section>
+</div>
+
+<script>
+"use strict";
+const C = String.raw;
+
+/* ============================================================
+   PERGUNTAS
+   Campos (fields):
+     t: "num"   número (decimal ou 0x…)
+        "hex"   número em hexadecimal (aceita sem 0x)
+        "instr" instrução / texto de código (ignora espaços e maiúsculas; 0x… = decimal)
+        "text"  texto exato (output do terminal)
+        "choice" lista pendente (opts)
+        "radio"  escolha múltipla com código (opts = blocos de código, a = [índice])
+   ============================================================ */
+const ELEM_OPTS = ["8","8º elemento","4º elemento","24","0","5","Nenhum","4","1º elemento","9º elemento","16","2º elemento","16º elemento","17º elemento"];
+const ELEM_OPTS2 = ["0","4","7","-7","8","32","40","Nenhum","1º elemento","4º elemento","5º elemento","8º elemento","32º elemento","33º elemento"];
+
+const QS = [
+/* ---------------- ORIGINAIS ---------------- */
+{ id:"O1", src:"orig", label:"Pergunta 1", tema:"Operações lógicas",
+  txt:"Considere o seguinte código:",
+  code:C`daddi r7,r0,0x2745
+xori r8,r7,0x0500
+ori r8,r8,0xF000`,
+  fields:[{l:"Qual o valor final de r8 (responda em hexadecimal)?", t:"hex", a:["0xF245"]}],
+  exp:C`<ol>
+<li>r7 = 0x2745 = <code>0010 0111 0100 0101</code></li>
+<li>XOR 0x0500 = <code>0000 0101 0000 0000</code> → inverte os bits onde a máscara tem 1 → <code>0010 0010 0100 0101</code> = <b>0x2245</b></li>
+<li>OR 0xF000 = <code>1111 0000 0000 0000</code> → põe a 1 os 4 bits de cima → <code>1111 0010 0100 0101</code> = <b>0xF245</b></li></ol>
+Dica: com XOR/OR/AND podes trabalhar dígito hex a dígito hex: 7 XOR 5 = 2 (0111 ^ 0101 = 0010); 2 OR F = F.`
+},
+{ id:"O2", src:"orig", label:"Pergunta 2", tema:"Janela Data e endereços",
+  txt:"Considere a imagem (janela Data do WinMIPS64).",
+  code:C`0000 0000000000010000 CONTROL: .word 0x10000
+0008 0000000000010008 DATA:    .word 0x10008
+0010 0000000000000002 V:   .word 2, 15, -1, 45, 7
+0018 000000000000000f
+0020 ffffffffffffffff
+0028 000000000000002d
+0030 0000000000000007
+0038 0000000000000003    .word 3, -3, 0, 22, 8
+0040 fffffffffffffffd
+0048 0000000000000000
+0050 0000000000000016
+0058 0000000000000008`,
+  fields:[
+    {l:"Qual o endereço do elemento V[3]?", t:"num", a:["0x28"], show:"0x28 (= 40)"},
+    {l:"Para colocar a ZERO o elemento V[3] com a instrução sd R0,V(R3), qual o valor que deve estar previamente no registo R3?", t:"num", a:["24"], show:"24 (= 0x18)"}
+  ],
+  exp:C`V começa em 0x10 e cada <code>.word</code> ocupa 8 bytes. V[3] = 0x10 + 3×8 = 0x10 + 0x18 = <b>0x28</b> (lá está o 0x2d = 45). Em <code>sd R0,V(R3)</code> o endereço é V + R3, por isso R3 é só o <b>deslocamento</b>: 3 × 8 = <b>24</b>.`
+},
+{ id:"O3", src:"orig", label:"Pergunta 3", tema:"Strings (Ex. 9a)",
+  txt:C`Considere uma string <code>String: .asciiz "123456"</code>. Complete o seguinte código que conta os caracteres da string:`,
+  code:C`       daddi r4,r0,0
+While:
+       ______________
+       beqz r3,FimWhile
+       daddi r4,r4,1
+       j While
+FimWhile:`,
+  fields:[{l:"Instrução em falta:", t:"instr", a:["lb r3,String(r4)","lbu r3,String(r4)"]}],
+  exp:C`É o Ex. 9a1. Em cada volta lê-se o carácter i (<code>r4</code>) para <code>r3</code>; o <code>beqz</code> seguinte testa se é o <code>\0</code>. Caracteres têm 1 byte → <code>lb</code>, e o índice é logo o deslocamento: <code>lb r3,String(r4)</code>. No fim r4 = 6.`
+},
+{ id:"O4", src:"orig", label:"Pergunta 4", tema:"I/O e saltos",
+  txt:"Considere o seguinte programa em assembler MIPS64. O que vai aparecer no ecrã?",
+  code:C`.data
+CR: .word32 0x10000
+DR: .word32 0x10008
+S1: .asciiz "Bom"
+S2: .asciiz "Dia"
+.code
+ lwu r1, CR(r0)
+ lwu r2, DR(r0)
+ beq r1, r0, Dia
+ daddi r3, r0, S1
+ sd r3, (r2)
+ daddi r3, r0, 4
+ sd r3, (r1)
+Dia:
+ daddi r3, r0, S2
+ sd r3, (r2)
+ daddi r3, r0, 4
+ sd r3, (r1)
+halt`,
+  fields:[{l:"Resposta:", t:"text", a:["BomDia"]}],
+  exp:C`r1 = 0x10000 (≠ 0), por isso <code>beq r1,r0,Dia</code> <b>não</b> salta: mostra "Bom" (código 4). Depois o programa continua para a etiqueta Dia e mostra "Dia". As strings saem coladas, sem espaço nem mudança de linha: <b>BomDia</b>.`
+},
+{ id:"O5", src:"orig", label:"Pergunta 5", tema:"Tamanho dos dados",
+  txt:"Considere o código para MIPS64. Indique o tamanho dos seguintes objetos em <b>bytes</b>:",
+  code:C`.data
+A: .space 100
+B: .word 234, -2, 17, 0x45ABC
+C: .asciiz "Arquitetura"
+D: .ascii "Sun"
+E: .word 4`,
+  fields:[
+    {l:"A:", t:"num", a:["100"]},
+    {l:"B:", t:"num", a:["32"]},
+    {l:"C:", t:"num", a:["12"]},
+    {l:"D:", t:"num", a:["3"]},
+    {l:"E:", t:"num", a:["8"]}
+  ],
+  exp:C`A: <code>.space 100</code> = 100. B: 4 valores × 8 bytes (.word = 64 bits) = 32. C: "Arquitetura" tem 11 letras + <code>\0</code> = 12. D: <code>.ascii</code> não tem terminador = 3. E: um .word = 8.`
+},
+{ id:"O6", src:"orig", label:"Pergunta 6", tema:"Vetores e endereçamento",
+  txt:"(Mesmo código da P9, mas com formato de resposta diferente: 1º elemento = elemento 0.) Considere um vetor s de inteiros de 64 bits e o seguinte código:",
+  code:C`daddi r4, r0, 16
+daddi r5, r0, 8
+sd r4, s(r5)`,
+  fields:[
+    {l:"Que elemento do vetor é acedido?", t:"choice", opts:ELEM_OPTS, a:["2º elemento"]},
+    {l:"Qual o valor enviado para a memória?", t:"choice", opts:ELEM_OPTS, a:["16"]}
+  ],
+  exp:C`O endereço é s + r5 = s + 8. Cada elemento tem 8 bytes, logo 8 bytes = índice <b>1</b>. Como o 1.º elemento é o elemento 0, o índice 1 é o <b>2.º elemento</b>. O valor escrito é o de r4 = <b>16</b>. (Ratoeiras na lista: "8" é o deslocamento, "16" também é o valor.)`
+},
+{ id:"O7", src:"orig", label:"Pergunta 7", tema:"Máscaras (Ex. 7a)",
+  txt:"Considere uma casa com 16 portas e que r7 guarda o estado de cada porta nos bits 0 a 15 (bit 0 à direita). 0: porta aberta; 1: porta fechada. Pretende-se <b>fechar</b> as portas 2 e 15 (utilize apenas os espaços estritamente necessários).",
+  code:"",
+  fields:[{l:"Escreva a instrução necessária:", t:"instr", a:["ori r7,r7,0x8004"]}],
+  exp:C`Fechar = pôr bits a <b>1</b> → <b>OR</b>. Máscara com 1 nos bits 2 e 15: 0x0004 + 0x8000 = <b>0x8004</b> (cabe em 16 bits, por isso dá para usar o imediato): <code>ori r7,r7,0x8004</code>.`
+},
+{ id:"O8", src:"orig", label:"Pergunta 8", tema:"Máscaras > 16 bits",
+  txt:"Considere uma casa com 20 portas e que r7 guarda o estado de cada porta nos bits 0 a 19 (bit 0 à direita). 0: porta aberta; 1: porta fechada. Pretende-se <b>abrir</b> as portas 2 e 19. Complete o código com a declaração da máscara e escreva a instrução que aplica a máscara (apenas os espaços estritamente necessários).",
+  code:C`Mask: .word32 __________
+lw r8,Mask(r0)
+______________`,
+  fields:[
+    {l:"Mask: .word32", t:"hex", a:["0xFFF7FFFB"]},
+    {l:"Instrução que aplica a máscara:", t:"instr", a:["and r7,r7,r8","and r7,r8,r7"]}
+  ],
+  exp:C`Abrir = pôr bits a <b>0</b> → <b>AND</b> com máscara que tem 0 nos bits 2 e 19 e 1 no resto. Bits 2 e 19: 0x00000004 + 0x00080000 = 0x00080004 → invertido em 32 bits: <b>0xFFF7FFFB</b>. O bit 19 está acima dos 16 bits do imediato, por isso a máscara vai para memória e aplica-se com registos: <code>and r7,r7,r8</code>.`
+},
+{ id:"O9", src:"orig", label:"Pergunta 9", tema:"Vetores e endereçamento",
+  txt:"Considere o seguinte código:",
+  code:C`s: .word 5,3,7,12,0,1,15,1,8
+
+daddi r4, r0, 16
+daddi r5, r0, 8
+sd r4, s(r5)`,
+  fields:[
+    {l:"Qual o valor enviado para a memória?", t:"num", a:["16"]},
+    {l:"O código acede à posição ___ do vetor (1º elemento na posição 0)", t:"num", a:["1"]}
+  ],
+  exp:C`Mesmo código da P6: escreve r4 = <b>16</b> em s + 8. Como .word = 8 bytes, o deslocamento 8 corresponde à posição <b>1</b> (o 3 passa a 16).`
+},
+{ id:"O10", src:"orig", label:"Pergunta 10", tema:"Strings e I/O",
+  txt:"Considere o seguinte programa em Assembler MIPS64. Qual o output no terminal?",
+  code:C`.data
+Text: .asciiz "Arquitectura"
+CR: .word32 0x10000
+DR: .word32 0x10008
+.code
+lwu R1, CR(R0)
+lwu R2, DR(R0)
+daddi r3, r0, 0x20
+daddi r4, r0, 7
+sb r3, Text(r4)
+daddi r3, r0, Text
+sd r3, (r2)
+daddi r3, r0, 4
+sd r3, (r1)
+halt`,
+  fields:[{l:"Resposta:", t:"text", a:["Arquite tura"]}],
+  exp:C`0x20 = 32 = <b>espaço</b>. <code>sb r3,Text(r4)</code> escreve-o na posição 7: A0 r1 q2 u3 i4 t5 e6 <b>c7</b> t8 u9 r10 a11. O 'c' passa a espaço → <b>Arquite tura</b>. Depois mostra a string (código 4).`
+},
+{ id:"O11", src:"orig", label:"Pergunta 11", tema:"Registos e slt",
+  txt:"Considere o código para MIPS64:",
+  code:C`daddi r1, r0, 1
+daddi r2, r0, 2
+daddi r3, r0, 3
+slt r1, r3, r2`,
+  fields:[
+    {l:"r0:", t:"num", a:["0"]},
+    {l:"r1:", t:"num", a:["0"]},
+    {l:"r2:", t:"num", a:["2"]},
+    {l:"r3:", t:"num", a:["3"]}
+  ],
+  exp:C`r0 é sempre 0. <code>slt r1,r3,r2</code>: r3 &lt; r2? 3 &lt; 2 é falso → <b>r1 = 0</b> (o 1 anterior é substituído). r2 e r3 ficam 2 e 3.`
+},
+{ id:"O12", src:"orig", label:"Pergunta 12", tema:"Janela Data (.word16)",
+  txt:"Considere a imagem (janela Data do WinMIPS64).",
+  code:C`0000 0000000000010000 CR:   .word32 0x10000 ; Control Register
+0008 0000000000010008 DR:   .word32 0x10008 ; Data Register
+0010 00070064000f0003 V:    .word16 3, 15, 100, 7, 0xf5aa, 17, 5, 15, -100, 2023
+0018 000f00050011f5aa
+0020 0000000007e7ff9c
+0028 000000000000000a VLen: .word 10 ; tamanho do vetor`,
+  fields:[
+    {l:"Qual o valor do elemento V[3]?", t:"num", a:["7"]},
+    {l:"Qual o endereço do elemento V[3]?", t:"num", a:["0x16"], show:"0x16 (= 22)"},
+    {l:"Para colocar a ZERO o elemento V[3] com a instrução sh R0,V(R3), qual o valor que deve estar previamente no registo R3?", t:"num", a:["6"]}
+  ],
+  exp:C`.word16 = 2 bytes por elemento. Linha 0x10 lida da direita: 0003 | 000f | 0064 | <b>0007</b> → V[3] = <b>7</b>. Endereço: 0x10 + 3×2 = <b>0x16</b>. Deslocamento para o <code>sh</code>: 3×2 = <b>6</b>.`
+},
+
+/* ---------------- NOVAS ---------------- */
+{ id:"N1", src:"novo", label:"Extra 1", tema:"Operações lógicas",
+  txt:"Considere o seguinte código:",
+  code:C`daddi r7,r0,0x13A6
+andi r8,r7,0x0FF0
+xori r8,r8,0x0101`,
+  fields:[{l:"Qual o valor final de r8 (em hexadecimal)?", t:"hex", a:["0x2A1"], show:"0x02A1"}],
+  exp:C`AND 0x0FF0 mantém só os 3 dígitos do meio: 0x13A6 → <b>0x03A0</b>. XOR 0x0101 inverte o bit 0 e o bit 8: 0x03A0 → 0x02A1 (3 XOR 1 = 2; 0 XOR 1 = 1). Resultado <b>0x02A1</b>.`
+},
+{ id:"N2", src:"novo", label:"Extra 2", tema:"Janela Data e endereços",
+  txt:"Considere a janela Data:",
+  code:C`0000 0000000000010000 CR: .word 0x10000
+0008 0000000000010008 DR: .word 0x10008
+0010 0000000000000004 V:  .word 4, -2, 9, 31, 6
+0018 fffffffffffffffe
+0020 0000000000000009
+0028 000000000000001f
+0030 0000000000000006`,
+  fields:[
+    {l:"Qual o valor (decimal) de V[1]?", t:"num", a:["-2"]},
+    {l:"Qual o endereço de V[2]?", t:"num", a:["0x20"], show:"0x20 (= 32)"},
+    {l:"Para pôr V[4] a zero com sd R0,V(R3), qual o valor de R3?", t:"num", a:["32"], show:"32 (= 0x20)"}
+  ],
+  exp:C`0xfffffffffffffffe é −2 em complemento para 2. V[2] = 0x10 + 2×8 = 0x20. Para V[4] o deslocamento é 4×8 = 32 (não confundas com o endereço, que seria 0x30).`
+},
+{ id:"N3", src:"novo", label:"Extra 3", tema:"Janela Data (.word32)",
+  txt:"Considere a janela Data:",
+  code:C`0000 0000000000010000 CR: .word32 0x10000
+0008 0000000000010008 DR: .word32 0x10008
+0010 000000140000000a V:  .word32 10, 20, -5, 7, 99
+0018 00000007fffffffb
+0020 0000000000000063`,
+  fields:[
+    {l:"Qual o valor de V[3]?", t:"num", a:["7"]},
+    {l:"Qual o endereço de V[3]?", t:"num", a:["0x1C"], show:"0x1C (= 28)"},
+    {l:"Para pôr V[3] a zero com sw R0,V(R3), qual o valor de R3?", t:"num", a:["12"]}
+  ],
+  exp:C`.word32 = 4 bytes = 8 dígitos hex. Linha 0x10 da direita: 0000000a (V[0]=10) | 00000014 (V[1]=20). Linha 0x18: fffffffb (V[2]=−5) | <b>00000007</b> (V[3]=7). Endereço 0x10 + 3×4 = 0x1C; deslocamento 12.`
+},
+{ id:"N4", src:"novo", label:"Extra 4", tema:"Strings (Ex. 9a2)",
+  txt:C`Complete o código que conta os espaços da string <code>String: .asciiz "Bom dia a todos"</code> (r6 = 0x20, r5 = contador):`,
+  code:C`       daddi r4,r0,0
+       daddi r5,r0,0
+       daddi r6,r0,0x20
+While: lb r3,String(r4)
+       beqz r3,FimWhile
+       ______________
+       daddi r5,r5,1
+NaoEspaco:
+       daddi r4,r4,1
+       j While
+FimWhile:`,
+  fields:[
+    {l:"Instrução em falta:", t:"instr", a:["bne r3,r6,NaoEspaco","bne r6,r3,NaoEspaco"]},
+    {l:"Valor final de r5:", t:"num", a:["3"]}
+  ],
+  exp:C`Se o carácter <b>não</b> é espaço, salta por cima do <code>conta++</code>: <code>bne r3,r6,NaoEspaco</code> (condição contrária). "Bom dia a todos" tem 3 espaços.`
+},
+{ id:"N5", src:"novo", label:"Extra 5", tema:"I/O e saltos",
+  txt:"O que vai aparecer no ecrã?",
+  code:C`.data
+CR: .word32 0x10000
+DR: .word32 0x10008
+S1: .asciiz "Ola"
+S2: .asciiz "Mundo"
+.code
+ lwu r1, CR(r0)
+ lwu r2, DR(r0)
+ daddi r5, r0, 3
+ daddi r6, r0, 3
+ bne r5, r6, Fim
+ daddi r3, r0, S1
+ sd r3, (r2)
+ daddi r3, r0, 4
+ sd r3, (r1)
+ j Fim
+ daddi r3, r0, S2
+ sd r3, (r2)
+ daddi r3, r0, 4
+ sd r3, (r1)
+Fim:
+halt`,
+  fields:[{l:"Resposta:", t:"text", a:["Ola"]}],
+  exp:C`r5 = r6, logo o <code>bne</code> não salta e mostra "Ola". Depois o <code>j Fim</code> salta por cima do código de "Mundo", que nunca é executado.`
+},
+{ id:"N6", src:"novo", label:"Extra 6", tema:"Tamanho dos dados",
+  txt:"Indique o tamanho dos seguintes objetos em bytes:",
+  code:C`.data
+A: .space 20
+B: .word16 1, 2, 3
+C: .word32 7, 8
+D: .asciiz "MIPS64"
+E: .ascii "Ola"
+F: .byte 1, 2, 3, 4, 5
+G: .word 1, 2`,
+  fields:[
+    {l:"A:", t:"num", a:["20"]},{l:"B:", t:"num", a:["6"]},{l:"C:", t:"num", a:["8"]},
+    {l:"D:", t:"num", a:["7"]},{l:"E:", t:"num", a:["3"]},{l:"F:", t:"num", a:["5"]},{l:"G:", t:"num", a:["16"]}
+  ],
+  exp:C`A 20 · B 3×2 = 6 · C 2×4 = 8 · D "MIPS64" 6 + \0 = 7 · E 3 (sem \0) · F 5×1 = 5 · G 2×8 = 16.`
+},
+{ id:"N7", src:"novo", label:"Extra 7", tema:"Alinhamento na memória",
+  txt:"Considerando que o segmento de dados começa no endereço 0 e que o WinMIPS64 começa cada linha de diretiva num múltiplo de 8, indique os endereços:",
+  code:C`.data
+A: .byte 1, 2, 3
+B: .word16 5
+C: .word 9
+D: .asciiz "SC"
+E: .word32 1`,
+  fields:[
+    {l:"Endereço de B:", t:"num", a:["8"]},
+    {l:"Endereço de C:", t:"num", a:["16"], show:"16 (= 0x10)"},
+    {l:"Endereço de E:", t:"num", a:["32"], show:"32 (= 0x20)"}
+  ],
+  exp:C`A ocupa 0–2 → B salta para 8. B ocupa 8–9 → C em 16. C ocupa 16–23 → D em 24 ("SC\0" = 3 bytes, 24–26) → E no próximo múltiplo de 8: 32.`
+},
+{ id:"N8", src:"novo", label:"Extra 8", tema:"Vetores e endereçamento",
+  txt:"Considere um vetor s de inteiros de 64 bits (1º elemento = elemento 0) e o seguinte código:",
+  code:C`daddi r4, r0, -7
+daddi r5, r0, 32
+sd r4, s(r5)`,
+  fields:[
+    {l:"Que elemento do vetor é acedido?", t:"choice", opts:ELEM_OPTS2, a:["5º elemento"]},
+    {l:"Qual o valor enviado para a memória?", t:"choice", opts:ELEM_OPTS2, a:["-7"]}
+  ],
+  exp:C`32 bytes ÷ 8 = índice 4 → <b>5.º elemento</b>. O valor escrito é o de r4 = <b>−7</b>.`
+},
+{ id:"N9", src:"novo", label:"Extra 9", tema:"Vetores .word16",
+  txt:C`Considere <code>v: .word16 10, 20, 30, 40, 50</code> e o código:`,
+  code:C`daddi r4, r0, 99
+daddi r5, r0, 6
+sh r4, v(r5)`,
+  fields:[
+    {l:"Em que posição do vetor fica o 99 (1º elemento na posição 0)?", t:"num", a:["3"]},
+    {l:"Que valor foi substituído?", t:"num", a:["40"]}
+  ],
+  exp:C`.word16 = 2 bytes → deslocamento 6 ÷ 2 = posição <b>3</b>, onde estava o <b>40</b>.`
+},
+{ id:"N10", src:"novo", label:"Extra 10", tema:"Máscaras (Ex. 7a)",
+  txt:"r7 guarda o estado de 8 portas (bit 0 à direita; 0 aberta, 1 fechada). Pretende-se <b>abrir</b> as portas 3 e 6, sem mexer nas outras.",
+  code:"",
+  fields:[{l:"Escreva a instrução necessária:", t:"instr", a:["andi r7,r7,0xB7","andi r7,r7,0xFFB7"], show:"andi r7,r7,0xB7"}],
+  exp:C`Abrir = pôr a 0 → <b>AND</b> com 0 nos bits 3 e 6: bits 3 e 6 = 0x08 + 0x40 = 0x48 = 0100 1000 → invertido (8 bits) = 1011 0111 = <b>0xB7</b>. (0xFFB7 também funciona: mantém os bits 8–15.)`
+},
+{ id:"N11", src:"novo", label:"Extra 11", tema:"Máscaras (Ex. 7a)",
+  txt:"Considere o código:",
+  code:C`daddi r7,r0,0x5A
+xori r7,r7,0x81`,
+  fields:[
+    {l:"Valor final de r7 (hexadecimal):", t:"hex", a:["0xDB"]},
+    {l:"Que portas mudaram de estado? (ex.: 0 e 7)", t:"instr", a:["0e7","7e0","0,7","7,0"], show:"0 e 7"}
+  ],
+  exp:C`0x5A = 0101 1010; máscara 0x81 = 1000 0001 → XOR inverte os bits 0 e 7: 1101 1011 = <b>0xDB</b>.`
+},
+{ id:"N12", src:"novo", label:"Extra 12", tema:"Máscaras > 16 bits",
+  txt:"24 portas em r7 (bits 0 a 23; 1 = fechada). Pretende-se <b>fechar</b> as portas 1 e 20. Complete:",
+  code:C`Mask: .word32 __________
+lw r8,Mask(r0)
+______________`,
+  fields:[
+    {l:"Mask: .word32", t:"hex", a:["0x00100002"], show:"0x00100002"},
+    {l:"Instrução que aplica a máscara:", t:"instr", a:["or r7,r7,r8","or r7,r8,r7"]}
+  ],
+  exp:C`Fechar = pôr a 1 → OR com 1 nos bits 1 e 20: 0x2 + 0x100000 = <b>0x00100002</b>. O bit 20 não cabe num imediato de 16 bits → <code>or r7,r7,r8</code>.`
+},
+{ id:"N13", src:"novo", label:"Extra 13", tema:"IP e máscara de rede (Ex. 7b)",
+  txt:"Considere o IP 192.168.10.100 com máscara /26.",
+  code:"",
+  fields:[
+    {l:"Máscara /26 em hexadecimal (.word32):", t:"hex", a:["0xFFFFFFC0"]},
+    {l:"Endereço de rede (decimal com pontos):", t:"instr", a:["192.168.10.64"]},
+    {l:"Endereço de broadcast:", t:"instr", a:["192.168.10.127"]}
+  ],
+  exp:C`/26 → último octeto 1100 0000 = 0xC0 → <b>0xFFFFFFC0</b>. 100 = 0110 0100. Rede (AND): 0100 0000 = <b>64</b>. Broadcast (OR com 0011 1111): 0111 1111 = <b>127</b>.`
+},
+{ id:"N14", src:"novo", label:"Extra 14", tema:"Little endian",
+  txt:"Pretende-se declarar o IP 10.0.5.1 como vetor de bytes de modo a que, lido com <code>lw</code>, dê 0x0A000501 (o MIPS é little endian). Complete:",
+  code:C`IP: .byte ____________`,
+  fields:[{l:"IP: .byte", t:"instr", a:["1,5,0,10"]}],
+  exp:C`Little endian: o byte menos significativo (o último octeto, 1) vai para o endereço mais baixo → <code>.byte 1,5,0,10</code>.`
+},
+{ id:"N15", src:"novo", label:"Extra 15", tema:"Registos e slt",
+  txt:"Considere o código:",
+  code:C`daddi r1,r0,5
+daddi r2,r0,-3
+slt r3,r2,r1
+slti r4,r1,5`,
+  fields:[{l:"r3:", t:"num", a:["1"]},{l:"r4:", t:"num", a:["0"]}],
+  exp:C`−3 &lt; 5 → r3 = 1. 5 &lt; 5 é falso (é estritamente menor) → r4 = 0.`
+},
+{ id:"N16", src:"novo", label:"Extra 16", tema:"Strings (Ex. 9b)",
+  txt:"Qual o output no terminal?",
+  code:C`.data
+CR: .word32 0x10000
+DR: .word32 0x10008
+Text: .asciiz "sc64ei!"
+.code
+       lwu r1,CR(r0)
+       lwu r2,DR(r0)
+       daddi r5,r0,0
+While: lb r4,Text(r5)
+       beqz r4,FimWhile
+       slti r3,r4,97
+       bnez r3,NaoConverte
+       slti r3,r4,123
+       beqz r3,NaoConverte
+       daddi r4,r4,-32
+       sb r4,Text(r5)
+NaoConverte:
+       daddi r5,r5,1
+       j While
+FimWhile:
+       daddi r3,r0,Text
+       sd r3,(r2)
+       daddi r3,r0,4
+       sd r3,(r1)
+       halt`,
+  fields:[{l:"Resposta:", t:"text", a:["SC64EI!"]}],
+  exp:C`Só as letras entre 'a' (97) e 'z' (122) passam a maiúsculas (−32). Os dígitos '6','4' (54, 52) e o '!' (33) são &lt; 97 e não mudam → <b>SC64EI!</b>`
+},
+{ id:"N17", src:"novo", label:"Extra 17", tema:"Strings → inteiro (Ex. 9c)",
+  txt:C`Complete o código que converte <code>String: .asciiz "305"</code> num inteiro em r6 (r10 = 10):`,
+  code:C`While: lb r4,String(r5)
+       beqz r4,FimWhile
+       dmul r6,r6,r10
+       ______________
+       dadd r6,r6,r4
+       daddi r5,r5,1
+       j While
+FimWhile:`,
+  fields:[
+    {l:"Instrução em falta:", t:"instr", a:["daddi r4,r4,-48","daddi r4,r4,-0x30"]},
+    {l:"Valor de r6 no fim:", t:"num", a:["305"]}
+  ],
+  exp:C`O carácter '3' tem código 51; tirando 48 fica 3. Iterações: 0×10+3 = 3 → 3×10+0 = 30 → 30×10+5 = <b>305</b>.`
+},
+{ id:"N18", src:"novo", label:"Extra 18", tema:"Estruturas de controlo",
+  txt:"Qual o código MIPS correto para: <b>Se r1 ≥ r2 faz op1</b>?",
+  code:"",
+  fields:[{l:"Selecione uma opção:", t:"radio", a:[0], opts:[
+C`slt r3,r1,r2
+bnez r3,NaoFaz
+op1
+NaoFaz:`,
+C`slt r3,r1,r2
+beqz r3,NaoFaz
+op1
+NaoFaz:`,
+C`slt r3,r2,r1
+beqz r3,NaoFaz
+op1
+NaoFaz:`,
+C`bne r1,r2,NaoFaz
+op1
+NaoFaz:`]}],
+  why:["r3 = 1 quando r1 &lt; r2 (condição contrária) → salta por cima.", "Isto é “se r1 &lt; r2”.", "Isto é “se r1 &gt; r2” (não inclui o igual).", "Isto é “se r1 = r2”."],
+  exp:C`Testa-se a condição contrária (r1 &lt; r2) com <code>slt</code>; se for verdade (r3 ≠ 0) salta por cima de op1.`
+},
+{ id:"N19", src:"novo", label:"Extra 19", tema:"I/O (Ex. 5)",
+  txt:"Com r1 = endereço de CONTROL e r2 = endereço de DATA, qual a sequência que lê um inteiro do teclado para r4?",
+  code:"",
+  fields:[{l:"Selecione uma opção:", t:"radio", a:[0], opts:[
+C`daddi r3,r0,8
+sd r3,(r1)
+ld r4,(r2)`,
+C`daddi r3,r0,8
+sd r3,(r2)
+ld r4,(r1)`,
+C`ld r4,(r2)
+daddi r3,r0,8
+sd r3,(r1)`,
+C`daddi r3,r0,2
+sd r3,(r1)
+ld r4,(r2)`]}],
+  why:["Código 8 em CONTROL e depois lê-se DATA.", "Trocou CONTROL com DATA.", "Lê DATA antes de pedir a leitura.", "O código 2 é para mostrar um inteiro, não para ler."],
+  exp:C`Ler: (1) código 8 → CONTROL, (2) valor ← DATA. Mostrar é ao contrário: (1) valor → DATA, (2) código → CONTROL.`
+},
+{ id:"N20", src:"novo", label:"Extra 20", tema:"Strings e I/O",
+  txt:"Qual o output no terminal?",
+  code:C`.data
+CR: .word32 0x10000
+DR: .word32 0x10008
+Text: .asciiz "banana"
+.code
+       lwu r1,CR(r0)
+       lwu r2,DR(r0)
+       daddi r5,r0,0
+       daddi r6,r0,97
+       daddi r7,r0,111
+While: lb r4,Text(r5)
+       beqz r4,Fim
+       bne r4,r6,Seguinte
+       sb r7,Text(r5)
+Seguinte:
+       daddi r5,r5,1
+       j While
+Fim:   daddi r3,r0,Text
+       sd r3,(r2)
+       daddi r3,r0,4
+       sd r3,(r1)
+       halt`,
+  fields:[{l:"Resposta:", t:"text", a:["bonono"]}],
+  exp:C`97 = 'a' e 111 = 'o'. Cada 'a' é substituído por 'o' → <b>bonono</b>.`
+},
+{ id:"N21", src:"novo", label:"Extra 21", tema:"Strings e I/O",
+  txt:"Qual o output no terminal?",
+  code:C`.data
+Text: .asciiz "Computadores"
+CR: .word32 0x10000
+DR: .word32 0x10008
+.code
+lwu r1,CR(r0)
+lwu r2,DR(r0)
+daddi r4,r0,4
+sb r0,Text(r4)
+daddi r3,r0,Text
+sd r3,(r2)
+daddi r3,r0,4
+sd r3,(r1)
+halt`,
+  fields:[{l:"Resposta:", t:"text", a:["Comp"]}],
+  exp:C`<code>sb r0,…</code> escreve o byte 0 (o terminador <code>\0</code>) na posição 4. A string mostrada acaba aí: C0 o1 m2 p3 → <b>Comp</b>.`
+},
+{ id:"N22", src:"novo", label:"Extra 22", tema:"Load com e sem sinal",
+  txt:C`Considere <code>X: .byte 200</code> e o código:`,
+  code:C`lb  r1,X(r0)
+lbu r2,X(r0)`,
+  fields:[{l:"r1 (decimal):", t:"num", a:["-56"]},{l:"r2 (decimal):", t:"num", a:["200"]}],
+  exp:C`200 = 0xC8 = 1100 1000 (bit 7 a 1). <code>lb</code> estende o sinal → 200 − 256 = <b>−56</b>. <code>lbu</code> enche com zeros → <b>200</b>.`
+},
+{ id:"N23", src:"novo", label:"Extra 23", tema:"I/O e saltos",
+  txt:"O que vai aparecer no ecrã?",
+  code:C`.data
+CR: .word32 0x10000
+DR: .word32 0x10008
+S1: .asciiz "Bom"
+S2: .asciiz "Dia"
+.code
+ lwu r1, CR(r0)
+ lwu r2, DR(r0)
+ daddi r5, r0, 0
+ bnez r5, Dia
+ daddi r3, r0, S1
+ sd r3, (r2)
+ daddi r3, r0, 4
+ sd r3, (r1)
+ j Fim
+Dia:
+ daddi r3, r0, S2
+ sd r3, (r2)
+ daddi r3, r0, 4
+ sd r3, (r1)
+Fim:
+halt`,
+  fields:[{l:"Resposta:", t:"text", a:["Bom"]}],
+  exp:C`r5 = 0 → <code>bnez</code> não salta → mostra "Bom". O <code>j Fim</code> salta por cima de "Dia". Compara com a P4, onde não havia <code>j</code>.`
+},
+{ id:"N24", src:"novo", label:"Extra 24", tema:"I/O (Ex. 5 e 6)",
+  txt:"Que valor se escreve em CONTROL para:",
+  code:"",
+  fields:[
+    {l:"Mostrar uma string:", t:"num", a:["4"]},
+    {l:"Mostrar um inteiro com sinal:", t:"num", a:["2"]},
+    {l:"Ler um inteiro do teclado:", t:"num", a:["8"]},
+    {l:"Limpar o terminal:", t:"num", a:["6"]},
+    {l:"Ler um carácter sem eco:", t:"num", a:["9"]}
+  ],
+  exp:C`Estão no guia de consulta: 1 sem sinal, 2 com sinal, 3 float, 4 string, 5 RGB, 6 limpa terminal, 7 limpa gráficos, 8 lê número, 9 lê byte.`
+},
+{ id:"N25", src:"novo", label:"Extra 25", tema:"Vetores (Ex. 8b)",
+  txt:C`No ciclo que mostra <code>Vetor: .word16 3, 15, 100, 7, …</code>, complete:`,
+  code:C`       daddi r3,r0,____   ; tamanho de cada elemento
+       dmul r8,r5,r3      ; r8 = i * tamanho
+       ____ r4,Vetor(r8)  ; r4 = Vetor[i]`,
+  fields:[
+    {l:"Valor do daddi (tamanho):", t:"num", a:["2"]},
+    {l:"Instrução de leitura:", t:"instr", a:["lh","lhu"], show:"lh"}
+  ],
+  exp:C`.word16 = 16 bits = 2 bytes → r3 = 2 e lê-se com <code>lh</code> (load halfword). Com .word seria 8 e <code>ld</code>.`
+}
+];
+
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+const $ = (s, r=document) => r.querySelector(s);
+function h(tag, attrs, ...kids){
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs||{})){
+    if (v === undefined || v === null || v === false) continue;
+    if (k === "class") e.className = v;
+    else if (k === "html") e.innerHTML = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const k of kids.flat()){
+    if (k === null || k === undefined || k === false) continue;
+    e.append(k instanceof Node ? k : document.createTextNode(String(k)));
+  }
+  return e;
+}
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const byId = Object.fromEntries(QS.map(q => [q.id, q]));
+const fmt = n => (Math.round(n*100)/100).toString().replace(".", ",");
+const LET = "abcdefgh";
+
+/* ---------- correção de respostas ---------- */
+function parseNum(s, hexDefault){
+  s = String(s ?? "").trim().toLowerCase().replace(/\s+/g, "");
+  if (!s) return null;
+  let neg = false;
+  if (s[0] === "-"){ neg = true; s = s.slice(1); } else if (s[0] === "+") s = s.slice(1);
+  let v;
+  if (/^0x[0-9a-f]+$/.test(s)) v = BigInt(s);
+  else if (/^[0-9a-f]+h$/.test(s)) v = BigInt("0x" + s.slice(0, -1));
+  else if (hexDefault && /^[0-9a-f]+$/.test(s)) v = BigInt("0x" + s);
+  else if (/^\d+$/.test(s)) v = BigInt(s);
+  else return null;
+  return neg ? -v : v;
+}
+function normInstr(s){
+  return String(s ?? "").toLowerCase().replace(/[\s$#"']/g, "")
+    .replace(/0x[0-9a-f]+/g, m => BigInt(m).toString());
+}
+function normText(s){ return String(s ?? "").trim().replace(/^"(.*)"$/, "$1"); }
+function fieldOk(f, ans){
+  if (ans === null || ans === undefined || ans === "") return false;
+  switch (f.t){
+    case "num": { const v = parseNum(ans, false); return v !== null && f.a.some(x => parseNum(x, false) === v); }
+    case "hex": { const v = parseNum(ans, true);  return v !== null && f.a.some(x => parseNum(x, true) === v); }
+    case "instr": { const v = normInstr(ans); return f.a.some(x => normInstr(x) === v); }
+    case "text": return f.a.some(x => normText(x) === normText(ans));
+    case "choice": return f.a.includes(ans);
+    case "radio": return Number(ans) === f.a[0];
+  }
+  return false;
+}
+function showAns(f){ return f.t === "radio" ? "opção " + LET[f.a[0]] : (f.show || f.a[0]); }
+
+/* ============================================================
+   TEMA E TABS
+   ============================================================ */
+(function(){
+  const saved = store.get("sc_theme", null);
+  if (saved) document.documentElement.dataset.theme = saved;
+  $("#themeBtn").addEventListener("click", () => {
+    const cur = document.documentElement.dataset.theme ||
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const nxt = cur === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = nxt;
+    store.set("sc_theme", nxt);
+  });
+})();
+function showTab(name){
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
+  document.querySelectorAll("section.tab").forEach(s => s.classList.toggle("on", s.id === "tab-"+name));
+  if (name === "historico") renderHist();
+  store.set("sc_tab", name);
+  window.scrollTo(0,0);
+}
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.tab); });
+document.querySelectorAll(".toc a").forEach(a => a.addEventListener("click", e => {
+  e.preventDefault(); const t = document.querySelector(a.getAttribute("href")); if (t) t.scrollIntoView({behavior:"smooth"});
+}));
+
+/* ============================================================
+   CARTÕES
+   ============================================================ */
+function qHead(q, label){
+  return h("div", {class:"qhead"},
+    h("span", {class:"qnum"}, label || q.label),
+    h("span", {class:"chip"}, q.tema),
+    q.src === "orig" ? h("span", {class:"chip chip-o"}, "Teste de treino · P" + q.id.slice(1)) : h("span", {class:"chip chip-n"}, "Nova"));
+}
+function qBody(q){
+  return [ h("p", {class:"qtxt", html:q.txt, style:"margin:6px 0"}), q.code ? h("pre", {class:"code"}, q.code) : null ];
+}
+/* opts: {hide, answers (array por campo) , label} */
+function solutionCard(q, opts={}){
+  const card = h("article", {class:"card" + (opts.hide ? " hidden-sol" : "")});
+  card.append(qHead(q, opts.label), ...qBody(q));
+  const box = h("div", {class:"fields"});
+  q.fields.forEach((f, fi) => {
+    const mine = opts.answers ? opts.answers[fi] : undefined;
+    const ok = opts.answers ? fieldOk(f, mine) : true;
+    if (f.t === "radio"){
+      box.append(h("div", {class:"fl"}, f.l));
+      const list = h("div", {class:"optlist"});
+      f.opts.forEach((o, oi) => {
+        const isOk = oi === f.a[0];
+        const chosen = opts.answers && Number(mine) === oi && mine !== null && mine !== "";
+        list.append(h("div", {class:"opt" + (isOk ? " ok" : (chosen ? " chosen-bad" : ""))},
+          h("span", {class:"letter"}, LET[oi]),
+          h("div", {style:"min-width:0;flex:1"}, h("pre", {}, o),
+            chosen ? h("div", {class:"note"}, "← a tua resposta") : null,
+            q.why ? h("div", {class:"why note", html:(isOk ? "✔ " : "✘ ") + q.why[oi]}) : null)));
+      });
+      box.append(list);
+      if (opts.answers && (mine === null || mine === undefined || mine === "")) box.append(h("div", {class:"note"}, "Não respondeste."));
+      return;
+    }
+    const sol = h("div", {class:"sol" + (ok ? "" : " bad")},
+      h("span", {class:"k"}, f.l),
+      h("span", {class:"v"}, showAns(f)));
+    if (opts.answers){
+      sol.append(h("span", {class:"note"}, ok ? "✔ certo" :
+        (mine === null || mine === undefined || mine === "" ? "✘ sem resposta" : "")));
+      if (!ok && mine !== null && mine !== undefined && mine !== "")
+        sol.append(h("span", {class:"note"}, "✘ respondeste: "), h("span", {class:"mine"}, String(mine)));
+    }
+    box.append(sol);
+  });
+  card.append(box);
+  card.append(h("div", {class:"exp", html:"<strong>Explicação</strong>" + q.exp}));
+  if (opts.hide) card.append(h("button", {class:"btn ghost reveal", type:"button", onclick:() => card.classList.remove("hidden-sol")}, "Ver solução"));
+  return card;
+}
+
+/* ============================================================
+   CORREÇÃO
+   ============================================================ */
+function renderCorrecao(){
+  const f = $("#f-src").value, hide = $("#f-hide").checked;
+  const list = $("#corr-list"); list.textContent = "";
+  QS.filter(q => f === "all" || q.src === f).forEach(q => list.append(solutionCard(q, {hide})));
+}
+$("#f-src").addEventListener("change", renderCorrecao);
+$("#f-hide").addEventListener("change", renderCorrecao);
+const NNOVAS = QS.filter(q => q.src === "novo").length;
+$("#f-src").options[1].textContent = `Perguntas novas (${NNOVAS})`;
+$("#f-src").options[2].textContent = `Todas (${QS.length})`;
+$("#t-pool").options[1].textContent = `Só as ${NNOVAS} perguntas novas`;
+$("#t-pool").options[3].textContent = `Todas (${QS.length})`;
+
+/* ============================================================
+   TESTE
+   ============================================================ */
+let T = null, timerId = null;
+const POOL_NAMES = {orig:"Teste de treino (12)", novo:`Perguntas novas (${NNOVAS})`, mix:"12 aleatórias", all:`Todas (${QS.length})`};
+function saveT(){ if (T) store.set("sc_cur", T); }
+
+function startTest(){
+  const pool = $("#t-pool").value;
+  let qs;
+  if (pool === "orig") qs = QS.filter(q => q.src === "orig");
+  else if (pool === "novo") qs = QS.filter(q => q.src === "novo");
+  else if (pool === "mix") qs = shuffle(QS.slice()).slice(0, 12);
+  else qs = QS.slice();
+  if ($("#t-shufq").checked) qs = shuffle(qs.slice());
+  T = { pool, ids: qs.map(q => q.id), ans: qs.map(q => q.fields.map(() => "")), cur: 0,
+        mins: Math.max(0, parseInt($("#t-mins").value, 10) || 0), start: Date.now() };
+  saveT(); runTest();
+}
+$("#t-start").addEventListener("click", startTest);
+
+function runTest(){
+  $("#t-setup").hidden = true; $("#t-result").hidden = true; $("#t-resume").textContent = "";
+  $("#t-run").hidden = false;
+  clearInterval(timerId); timerId = setInterval(tick, 1000);
+  renderQ();
+}
+function remaining(){ return T.mins ? T.mins*60 - Math.floor((Date.now()-T.start)/1000) : null; }
+function elapsed(){ return Math.floor((Date.now()-T.start)/1000); }
+function mmss(s){ s = Math.max(0, s); const m = Math.floor(s/60), r = s%60; return m + ":" + String(r).padStart(2,"0"); }
+function tick(){
+  if (!T) return;
+  const el = $("#timer"); if (!el) return;
+  if (T.mins){
+    const r = remaining();
+    el.textContent = "Tempo restante " + mmss(r);
+    el.classList.toggle("low", r <= 300);
+    if (r <= 0) finishTest(true);
+  } else el.textContent = "Tempo " + mmss(elapsed());
+}
+const answered = k => T.ans[k].some(a => a !== "" && a !== null);
+
+function renderQ(){
+  const run = $("#t-run"); run.textContent = "";
+  const n = T.ids.length, i = T.cur, q = byId[T.ids[i]];
+  const nAns = T.ids.filter((_, k) => answered(k)).length;
+  run.append(h("div", {class:"runbar"},
+    h("strong", {}, `Pergunta ${i+1} de ${n}`),
+    h("span", {class:"timer", id:"timer"}, ""),
+    h("button", {class:"btn ghost", type:"button", onclick:() => {
+      const falta = n - nAns;
+      if (confirm(falta ? `Ainda tens ${falta} pergunta(s) sem resposta. Terminar?` : "Terminar o teste?")) finishTest(false);
+    }}, "Terminar teste")));
+
+  const card = h("article", {class:"card"});
+  card.append(qHead(q, `Pergunta ${i+1}`), ...qBody(q));
+  const box = h("div", {class:"fields"});
+  q.fields.forEach((f, fi) => {
+    const val = T.ans[i][fi];
+    const set = v => { T.ans[i][fi] = v; saveT(); updateGrid(); };
+    if (f.t === "radio"){
+      box.append(h("div", {class:"fl"}, f.l));
+      const list = h("div", {class:"radios"});
+      f.opts.forEach((o, oi) => {
+        const sel = val !== "" && Number(val) === oi;
+        const inp = h("input", {type:"radio", name:"r"+fi, checked:sel});
+        inp.addEventListener("change", () => { set(String(oi)); renderQ(); });
+        list.append(h("label", {class:"ans" + (sel ? " sel" : "")}, inp, h("pre", {}, o)));
+      });
+      box.append(list);
+    } else if (f.t === "choice"){
+      const sel = h("select", {}, h("option", {value:""}, "Escolha..."), ...f.opts.map(o => h("option", {value:o, selected: o === val}, o)));
+      sel.addEventListener("change", () => set(sel.value));
+      box.append(h("label", {class:"field"}, h("span", {class:"fl"}, f.l), sel));
+    } else {
+      const inp = h("input", {type:"text", value:val, autocomplete:"off", autocapitalize:"off", spellcheck:"false"});
+      inp.addEventListener("input", () => set(inp.value));
+      box.append(h("label", {class:"field"}, h("span", {class:"fl"}, f.l), inp));
+    }
+  });
+  card.append(box);
+  run.append(card);
+
+  run.append(h("div", {class:"navrow"},
+    h("button", {class:"btn ghost", type:"button", disabled:i===0, onclick:() => go(i-1)}, "← Anterior"),
+    i < n-1 ? h("button", {class:"btn", type:"button", onclick:() => go(i+1)}, "Seguinte →")
+            : h("button", {class:"btn", type:"button", onclick:() => { if (confirm("Terminar o teste?")) finishTest(false); }}, "Terminar")));
+  const grid = h("div", {class:"grid", id:"navgrid"});
+  run.append(h("div", {class:"card"}, h("div", {class:"note", id:"navnote"}, ""), grid));
+  updateGrid();
+  tick();
+}
+function updateGrid(){
+  const grid = $("#navgrid"); if (!grid) return;
+  grid.textContent = "";
+  T.ids.forEach((_, k) => grid.append(h("button", {type:"button",
+    class:(answered(k) ? "done" : "") + (k === T.cur ? " cur" : ""), onclick:() => go(k)}, k+1)));
+  $("#navnote").textContent = `Navegação · ${T.ids.filter((_, k) => answered(k)).length}/${T.ids.length} com resposta`;
+}
+function go(k){ T.cur = k; saveT(); renderQ(); window.scrollTo(0,0); }
+
+function grade(t){
+  let pts = 0, full = 0, zero = 0;
+  const per = t.ids.map((id, k) => {
+    const q = byId[id];
+    const okc = q.fields.filter((f, fi) => fieldOk(f, t.ans[k][fi])).length;
+    const p = okc / q.fields.length;
+    pts += p; if (p === 1) full++; else if (p === 0) zero++;
+    return p;
+  });
+  return {pts, full, zero, part: t.ids.length - full - zero, per, nota: pts / t.ids.length * 20};
+}
+function finishTest(timeUp){
+  clearInterval(timerId);
+  const g = grade(T);
+  const hist = store.get("sc_hist", []);
+  hist.unshift({d:Date.now(), pool:T.pool, n:T.ids.length, full:g.full, part:g.part, zero:g.zero, nota:g.nota, dur:elapsed()});
+  store.set("sc_hist", hist.slice(0, 100));
+  store.del("sc_cur");
+  showResult(T, g, timeUp);
+}
+function showResult(t, g, timeUp){
+  $("#t-run").hidden = true; $("#t-setup").hidden = true;
+  const res = $("#t-result"); res.hidden = false; res.textContent = "";
+  if (timeUp) res.append(h("div", {class:"banner"}, "⏰ O tempo acabou — o teste foi entregue automaticamente."));
+  const gr = h("div", {class:"grid"});
+  t.ids.forEach((_, k) => gr.append(h("button", {type:"button",
+    class: g.per[k] === 1 ? "ok" : g.per[k] > 0 ? "part" : "bad",
+    onclick:() => { const el = document.getElementById("rev-"+k); if (el) el.scrollIntoView({behavior:"smooth"}); }}, k+1)));
+  res.append(h("div", {class:"card"},
+    h("h2", {style:"margin:0 0 4px;font-size:1.2rem"}, "Resultado"),
+    h("div", {class:"note"}, `${POOL_NAMES[t.pool]} · duração ${mmss(Math.floor((Date.now()-t.start)/1000))}`),
+    h("div", {class:"stats"},
+      h("div", {class:"stat"}, h("div", {class:"v"}, fmt(g.nota)), h("div", {class:"l"}, "Nota (0–20)")),
+      h("div", {class:"stat"}, h("div", {class:"v"}, fmt(g.pts) + " / " + t.ids.length), h("div", {class:"l"}, "Pontos")),
+      h("div", {class:"stat ok"}, h("div", {class:"v"}, g.full), h("div", {class:"l"}, "Totalmente certas")),
+      h("div", {class:"stat"}, h("div", {class:"v"}, g.part), h("div", {class:"l"}, "Parcialmente certas")),
+      h("div", {class:"stat bad"}, h("div", {class:"v"}, g.zero), h("div", {class:"l"}, "Erradas / em branco"))),
+    gr,
+    h("div", {style:"display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"},
+      h("button", {class:"btn", type:"button", onclick:newTest}, "Novo teste"),
+      h("button", {class:"btn ghost", type:"button", onclick:() => {
+        const ids = t.ids.filter((_, k) => g.per[k] < 1);
+        if (!ids.length){ alert("Acertaste tudo — não há nada para repetir!"); return; }
+        T = {pool:t.pool, ids:shuffle(ids.slice()), ans:null, cur:0, mins:0, start:Date.now()};
+        T.ans = T.ids.map(id => byId[id].fields.map(() => ""));
+        saveT(); runTest();
+      }}, "Repetir só as que falhei"))));
+  res.append(h("label", {class:"note", style:"display:flex;gap:6px;align-items:center;margin:4px 0 12px"},
+    h("input", {type:"checkbox", id:"onlyBad"}), "Mostrar só as que não estão totalmente certas"));
+  const list = h("div", {});
+  const draw = () => {
+    list.textContent = "";
+    const only = $("#onlyBad").checked;
+    t.ids.forEach((id, k) => {
+      if (only && g.per[k] === 1) return;
+      const icon = g.per[k] === 1 ? "✔ " : g.per[k] > 0 ? "◐ " : "✘ ";
+      const c = solutionCard(byId[id], {answers:t.ans[k], label:icon + "Pergunta " + (k+1)});
+      c.id = "rev-" + k; list.append(c);
+    });
+  };
+  res.append(list);
+  $("#onlyBad").addEventListener("change", draw);
+  draw();
+  window.scrollTo(0,0);
+}
+function newTest(){
+  T = null; clearInterval(timerId);
+  $("#t-result").hidden = true; $("#t-run").hidden = true; $("#t-setup").hidden = false;
+  checkResume(); window.scrollTo(0,0);
+}
+function checkResume(){
+  const box = $("#t-resume"); box.textContent = "";
+  const cur = store.get("sc_cur", null);
+  if (!cur || !cur.ids || T || !cur.ids.every(id => byId[id])) return;
+  box.append(h("div", {class:"banner"},
+    h("span", {}, `Tens um teste a meio (${cur.ids.length} perguntas).`),
+    h("button", {class:"btn", type:"button", onclick:() => { T = cur; runTest(); }}, "Continuar"),
+    h("button", {class:"btn danger", type:"button", onclick:() => { store.del("sc_cur"); box.textContent = ""; }}, "Descartar")));
+}
+
+/* ============================================================
+   HISTÓRICO
+   ============================================================ */
+function renderHist(){
+  const box = $("#hist"); box.textContent = "";
+  const hist = store.get("sc_hist", []);
+  if (!hist.length){
+    box.append(h("div", {class:"card"}, h("p", {style:"margin:0"}, "Ainda não fizeste nenhum teste. Os resultados ficam guardados neste browser.")));
+    return;
+  }
+  const tb = h("tbody", {});
+  hist.forEach(r => tb.append(h("tr", {},
+    h("td", {}, new Date(r.d).toLocaleString("pt-PT", {dateStyle:"short", timeStyle:"short"})),
+    h("td", {}, POOL_NAMES[r.pool] || r.pool),
+    h("td", {}, r.full), h("td", {}, r.part), h("td", {}, r.zero),
+    h("td", {}, h("strong", {}, fmt(r.nota))), h("td", {}, mmss(r.dur)))));
+  box.append(h("div", {class:"card"},
+    h("div", {class:"tablewrap"}, h("table", {class:"hist", style:"width:100%"},
+      h("thead", {}, h("tr", {}, ["Data","Perguntas","Certas","Parciais","Erradas","Nota","Tempo"].map(x => h("th", {}, x)))), tb)),
+    h("div", {style:"margin-top:12px"},
+      h("button", {class:"btn danger", type:"button", onclick:() => { if (confirm("Apagar todo o histórico?")){ store.del("sc_hist"); renderHist(); } }}, "Apagar histórico"))));
+}
+
+/* ============================================================
+   INÍCIO
+   ============================================================ */
+renderCorrecao();
+checkResume();
+showTab(store.get("sc_tab", "materia"));
+</script>
+</body>
+</html>
