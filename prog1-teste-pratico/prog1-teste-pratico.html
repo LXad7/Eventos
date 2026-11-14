@@ -1,0 +1,1388 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prog I · Teste Prático</title>
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --surface2:#eef1f5; --text:#1b1f24; --muted:#5d6672;
+  --border:#d9dee5; --accent:#2457c5; --accent-weak:#e3ebfb;
+  --ok:#1d7a3e; --ok-bg:#e4f4ea; --bad:#b3261e; --bad-bg:#fbe8e6; --code-bg:#f2f4f7;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121417; --surface:#1b1e23; --surface2:#23272e; --text:#e6e8eb; --muted:#9aa3ae;
+    --border:#30353d; --accent:#7aa2ff; --accent-weak:#1f2a44;
+    --ok:#5fd28a; --ok-bg:#16301f; --bad:#ff8a80; --bad-bg:#3a1a18; --code-bg:#15181c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121417; --surface:#1b1e23; --surface2:#23272e; --text:#e6e8eb; --muted:#9aa3ae;
+  --border:#30353d; --accent:#7aa2ff; --accent-weak:#1f2a44;
+  --ok:#5fd28a; --ok-bg:#16301f; --bad:#ff8a80; --bad-bg:#3a1a18; --code-bg:#15181c;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:920px;margin:0 auto;padding:0 16px 64px}
+header{padding:20px 0 8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+header h1{margin:0;font-size:1.4rem}
+header p{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.theme button{font:inherit;font-size:.85rem;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:6px;padding:4px 8px;cursor:pointer}
+.tabs{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;padding:10px 0;border-bottom:1px solid var(--border);overflow-x:auto}
+.tabs button{flex:0 0 auto;border:1px solid var(--border);background:var(--surface);color:var(--text);padding:8px 14px;border-radius:999px;font:inherit;font-size:.95rem;cursor:pointer}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+section.tab{display:none;padding-top:16px}
+section.tab.on{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin:0 0 16px}
+.card h2{font-size:1.15rem;margin:0 0 8px}
+.card h3{font-size:1rem;margin:14px 0 6px}
+.qhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px}
+.qnum{font-weight:700}
+.chip{font-size:.78rem;padding:2px 8px;border-radius:999px;background:var(--accent-weak);color:var(--accent)}
+.enun{margin:4px 0 10px;color:var(--muted)}
+pre{margin:0;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;white-space:pre;overflow-x:auto}
+pre.code{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin:10px 0}
+code{font:.9em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--surface2);padding:1px 4px;border-radius:4px}
+.exp{padding:12px;border-radius:8px;background:var(--surface2);font-size:.95rem}
+.exp strong:first-child{display:block;margin-bottom:4px}
+.exp ul,.exp ol,.card ul,.card ol{margin:6px 0;padding-left:20px}
+.note{font-size:.88rem;color:var(--muted)}
+.btn{font:inherit;border:1px solid var(--accent);background:var(--accent);color:var(--bg);padding:9px 16px;border-radius:8px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hidden-sol .solbox{display:none}
+.reveal{display:none}
+.hidden-sol .reveal{display:inline-block}
+.toc{columns:2;column-gap:24px;padding-left:20px;margin:0}
+.toc a{color:var(--accent)}
+@media (max-width:600px){.toc{columns:1}}
+table{border-collapse:collapse;font-size:.92rem;width:100%}
+th,td{text-align:left;padding:6px 8px;border:1px solid var(--border);vertical-align:top}
+th{background:var(--surface2)}
+.ok{color:var(--ok);font-weight:700}
+.tablewrap{overflow-x:auto}
+.tip{border-left:4px solid var(--accent);background:var(--accent-weak);padding:8px 12px;border-radius:6px;margin:10px 0;font-size:.95rem}
+.trap{border-left:4px solid var(--bad);background:var(--bad-bg);padding:8px 12px;border-radius:6px;margin:10px 0;font-size:.95rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Programação I · Teste Prático 1 (Treino)</h1>
+    <p>Gestão de funcionários — resolução completa explicada, código pronto a compilar, variantes para treinar e estratégia. Funciona sem internet.</p>
+  </div>
+  <div class="theme"><button id="themeBtn" type="button">Tema</button></div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="resolucao" class="on">Resolução</button>
+  <button data-tab="codigo">Código completo</button>
+  <button data-tab="variantes">Variantes</button>
+  <button data-tab="estrategia">Estratégia e regras</button>
+</nav>
+
+<section class="tab on" id="tab-resolucao">
+  <div class="card">
+    <h2>Alíneas</h2>
+    <ol class="toc" style="list-style:none;padding-left:0"><li><a href="#al-a">a) Menu de opções + estrutura do menu no main()</a></li><li><a href="#al-b">b) Tipo de dados do funcionário</a></li><li><a href="#al-c">c) Estrutura de dados para 50 funcionários</a></li><li><a href="#al-d">d) Novo funcionário com número único</a></li><li><a href="#al-e">e) Mostrar os dados de um funcionário</a></li><li><a href="#al-f">f) Mostrar todos os funcionários</a></li><li><a href="#al-g">g) Média dos vencimentos</a></li><li><a href="#al-h">h) Percentagem com vencimento superior a 1000€</a></li><li><a href="#al-i">i) Admitidos desde novembro de 2020 + ficheiro de texto</a></li><li><a href="#al-j">j) Alterar o vencimento de um funcionário</a></li><li><a href="#al-k">k) Escrever num ficheiro binário</a></li><li><a href="#al-l">l) Ler do ficheiro binário</a></li></ol>
+    <p class="note" style="margin-bottom:0">Todo o código desta página foi compilado com <code>gcc -Wall -Wextra -pedantic -Wmissing-declarations -Wredundant-decls -Wfloat-equal -Wmain -Wshadow</code> (os avisos que o guia do Code::Blocks manda ativar) — <b>0 erros, 0 avisos</b> — e testado com dados.</p>
+  </div>
+  <article class="card" id="al-a">
+<div class="qhead"><span class="qnum">Alínea a)</span><span class="chip">Menu de opções + estrutura do menu no main()</span></div>
+<p class="enun">Elaborar uma função que apresente num menu de opções as funcionalidades (Novo funcionário; Listar; Percentagem com vencimento &gt; 1000€; Alterar vencimento; Escrever ficheiro binário; Ler ficheiro binário). O menu deverá também apresentar a quantidade de funcionários, a média dos vencimentos e a quantidade de admitidos desde novembro de 2020. Implementar a estrutura do menu na função <code>main()</code>.</p>
+<div class="exp"><strong>Como resolver</strong><ul>
+<li>A função <code>menu()</code> <b>só mostra e lê a opção</b>; os valores (quantidade, média, admitidos) chegam-lhe por parâmetro.</li>
+<li>No <code>main()</code>, dentro do <code>do … while</code>, calculam-se a média (alínea g) e os admitidos (alínea i) <b>antes</b> de chamar o menu, para estarem sempre atualizados.</li>
+<li><code>toupper()</code> (de <code>&lt;ctype.h&gt;</code>) aceita a opção em minúscula ou maiúscula; <code>limpaBufferStdin()</code> tira o Enter que ficou no buffer.</li>
+<li>O <code>switch</code> usa letras; o ciclo termina com 'S'. Lembra-te do <code>break</code> em cada <code>case</code>.</li>
+<li>Repara que <code>quantFunc = acrescentaFuncionario(...)</code> e <code>quantFunc = leFicheiroBinario(...)</code>: estas funções <b>devolvem</b> a nova quantidade.</li></ul></div>
+<pre class="code">/* a) Estrutura do menu na funcao main() */
+int main(void)
+{
+    tipoFuncionario funcionarios[MAX_FUNCIONARIOS];   /* c) estrutura de dados */
+    int quantFunc = 0;
+    int quantAdmitidos;
+    float media;
+    char opcao;
+
+    do
+    {
+        media = mediaVencimentos(funcionarios, quantFunc);
+        quantAdmitidos = admitidosDesdeNov2020(funcionarios, quantFunc);
+        opcao = menu(quantFunc, media, quantAdmitidos);
+
+        switch (opcao)
+        {
+        case &#x27;N&#x27;:
+            quantFunc = acrescentaFuncionario(funcionarios, quantFunc);
+            break;
+        case &#x27;L&#x27;:
+            mostraFuncionarios(funcionarios, quantFunc);
+            break;
+        case &#x27;P&#x27;:
+            percentagemVencimentoSuperior(funcionarios, quantFunc);
+            break;
+        case &#x27;A&#x27;:
+            alteraVencimento(funcionarios, quantFunc);
+            break;
+        case &#x27;E&#x27;:
+            gravaFicheiroBinario(funcionarios, quantFunc);
+            break;
+        case &#x27;R&#x27;:
+            quantFunc = leFicheiroBinario(funcionarios);
+            break;
+        case &#x27;S&#x27;:
+            printf(&quot;\nFim do programa\n&quot;);
+            break;
+        default:
+            printf(&quot;\nOpcao invalida\n&quot;);
+        }
+    }
+    while (opcao != &#x27;S&#x27;);
+
+    return 0;
+}</pre><pre class="code">/* a) Menu de opcoes */
+char menu(int quantFunc, float mediaVenc, int quantAdmitidos)
+{
+    char op;
+
+    printf(&quot;\n\n************** Gestao de Funcionarios **************\n&quot;);
+    printf(&quot; Funcionarios: %d\t Media dos vencimentos: %.2f euros\n&quot;, quantFunc, mediaVenc);
+    printf(&quot; Admitidos desde novembro de 2020: %d\n&quot;, quantAdmitidos);
+    printf(&quot;\n N - Novo funcionario&quot;);
+    printf(&quot;\n L - Listar dados de funcionarios&quot;);
+    printf(&quot;\n P - Percentagem de funcionarios com vencimento superior a 1000 euros&quot;);
+    printf(&quot;\n A - Alterar vencimento de um funcionario&quot;);
+    printf(&quot;\n E - Escrever dados num ficheiro binario&quot;);
+    printf(&quot;\n R - Ler dados do ficheiro binario&quot;);
+    printf(&quot;\n S - Sair&quot;);
+    printf(&quot;\n\t Opcao --&gt; &quot;);
+
+    op = getchar();
+    op = toupper(op);
+    if (op != &#x27;\n&#x27; &amp;&amp; op != EOF)
+    {
+        limpaBufferStdin();
+    }
+    return op;
+}</pre>
+</article>
+<article class="card" id="al-b">
+<div class="qhead"><span class="qnum">Alínea b)</span><span class="chip">Tipo de dados do funcionário</span></div>
+<p class="enun">Definir tipo de dados para agrupar: número (único), nome, vencimento mensal e data de admissão.</p>
+<div class="exp"><strong>Como resolver</strong><ul><li>A data é uma struct própria (<code>tipoData</code>), igual à da Ficha 6 — assim podes reutilizar o <code>lerData()</code>.</li>
+<li>Vencimento é <code>float</code> (tem cêntimos). Nome é <code>char nome[MAX_NOME]</code>.</li>
+<li>Usa <code>#define</code> para os limites: se o enunciado mudar o máximo, só mexes num sítio.</li></ul></div>
+<pre class="code">#define MAX_FUNCIONARIOS 50
+#define MAX_NOME 50
+#define VENCIMENTO_REF 1000.0
+#define FICH_BINARIO &quot;funcionarios.dat&quot;
+#define FICH_TEXTO &quot;admitidos.txt&quot;
+
+/* b) Tipos de dados */
+typedef struct
+{
+    int dia;
+    int mes;
+    int ano;
+} tipoData;
+
+typedef struct
+{
+    int numero;
+    char nome[MAX_NOME];
+    float vencimento;
+    tipoData dataAdmissao;
+} tipoFuncionario;</pre>
+</article>
+<article class="card" id="al-c">
+<div class="qhead"><span class="qnum">Alínea c)</span><span class="chip">Estrutura de dados para 50 funcionários</span></div>
+<p class="enun">Declarar uma estrutura de dados para armazenar a informação dos funcionários da empresa (no máximo 50).</p>
+<div class="exp"><strong>Como resolver</strong><p>Um <b>vetor</b> de <code>tipoFuncionario</code> com capacidade <code>MAX_FUNCIONARIOS</code> (50) + um <b>contador</b> <code>quantFunc</code> que começa a 0. Declaram-se dentro do <code>main()</code> (nada de variáveis globais).</p></div>
+<pre class="code">tipoFuncionario funcionarios[MAX_FUNCIONARIOS];   /* c) estrutura de dados */
+int quantFunc = 0;</pre>
+</article>
+<article class="card" id="al-d">
+<div class="qhead"><span class="qnum">Alínea d)</span><span class="chip">Novo funcionário com número único</span></div>
+<p class="enun">Elaborar uma função que armazene na estrutura os dados de um novo funcionário, que deverá ter um número único (não repetido).</p>
+<div class="exp"><strong>Como resolver</strong><ol><li>Se o vetor está cheio (<code>quantFunc == MAX_FUNCIONARIOS</code>) avisa e não faz nada.</li>
+<li>Lê os dados com <code>lerDadosFuncionario()</code> (usa <code>lerInteiro</code>, <code>lerString</code>, <code>lerFloat</code>, <code>lerData</code>).</li>
+<li><code>procuraFuncionario()</code> devolve a posição ou <b>-1</b>. Só acrescenta se for -1.</li>
+<li>Acrescenta na posição <code>quantFunc</code> e incrementa. <b>Devolve</b> a nova quantidade (passagem por valor!).</li></ol></div>
+<pre class="code">/* Obtem os dados de um funcionario */
+tipoFuncionario lerDadosFuncionario(void)
+{
+    tipoFuncionario func;
+
+    printf(&quot;Numero do funcionario (1 a 9999): &quot;);
+    func.numero = lerInteiro(1, 9999);
+
+    printf(&quot;Nome: &quot;);
+    lerString(func.nome, MAX_NOME);
+
+    printf(&quot;Vencimento mensal (euros): &quot;);
+    func.vencimento = lerFloat(0, 100000);
+
+    printf(&quot;Data de admissao:&quot;);
+    func.dataAdmissao = lerData();
+
+    return func;
+}</pre><pre class="code">/* Devolve a posicao do funcionario com esse numero, ou -1 se nao existir */
+int procuraFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc, int numero)
+{
+    int i, pos = -1;
+
+    for (i = 0; i &lt; quantFunc; i++)
+    {
+        if (vetor[i].numero == numero)
+        {
+            pos = i;
+            i = quantFunc;      /* termina a pesquisa */
+        }
+    }
+    return pos;
+}</pre><pre class="code">/* d) Acrescenta um funcionario com numero unico; devolve a nova quantidade */
+int acrescentaFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    tipoFuncionario func;
+
+    if (quantFunc == MAX_FUNCIONARIOS)
+    {
+        printf(&quot;\nImpossivel acrescentar: limite de %d funcionarios atingido\n&quot;, MAX_FUNCIONARIOS);
+    }
+    else
+    {
+        func = lerDadosFuncionario();
+        if (procuraFuncionario(vetor, quantFunc, func.numero) != -1)
+        {
+            printf(&quot;\nJa existe um funcionario com o numero %d - nao foi acrescentado\n&quot;, func.numero);
+        }
+        else
+        {
+            vetor[quantFunc] = func;
+            quantFunc++;
+        }
+    }
+    return quantFunc;
+}</pre>
+</article>
+<article class="card" id="al-e">
+<div class="qhead"><span class="qnum">Alínea e)</span><span class="chip">Mostrar os dados de um funcionário</span></div>
+<p class="enun">Elaborar uma função que apresente no monitor os dados de um funcionário.</p>
+<div class="exp"><strong>Como resolver</strong><p>Recebe <b>um</b> funcionário (por valor, só lê). <code>%-25s</code> alinha o nome à esquerda em 25 colunas; <code>%02d</code> mostra 03 em vez de 3 nas datas; <code>%.2f</code> dá 2 casas decimais.</p></div>
+<pre class="code">/* e) Mostra os dados de um funcionario */
+void mostraFuncionario(tipoFuncionario func)
+{
+    printf(&quot;\n %4d  %-25s %10.2f   %02d/%02d/%04d&quot;, func.numero, func.nome, func.vencimento,
+           func.dataAdmissao.dia, func.dataAdmissao.mes, func.dataAdmissao.ano);
+}</pre>
+</article>
+<article class="card" id="al-f">
+<div class="qhead"><span class="qnum">Alínea f)</span><span class="chip">Mostrar todos os funcionários</span></div>
+<p class="enun">Elaborar uma função que apresente no monitor os dados de todos os funcionários.</p>
+<div class="exp"><strong>Como resolver</strong><p>Ciclo de 0 até <code>quantFunc</code> (não até 50!) chamando a função da alínea e). Trata o caso de não haver funcionários.</p></div>
+<pre class="code">/* f) Mostra os dados de todos os funcionarios */
+void mostraFuncionarios(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int i;
+
+    if (quantFunc == 0)
+    {
+        printf(&quot;\nNao existem funcionarios registados\n&quot;);
+    }
+    else
+    {
+        printf(&quot;\n Num.  Nome                      Vencimento   Admissao&quot;);
+        for (i = 0; i &lt; quantFunc; i++)
+        {
+            mostraFuncionario(vetor[i]);
+        }
+        printf(&quot;\n&quot;);
+    }
+}</pre>
+</article>
+<article class="card" id="al-g">
+<div class="qhead"><span class="qnum">Alínea g)</span><span class="chip">Média dos vencimentos</span></div>
+<p class="enun">Elaborar uma função que calcule, e devolva, a média dos vencimentos mensais dos funcionários.</p>
+<div class="exp"><strong>Como resolver</strong><p>Soma tudo e divide por <code>quantFunc</code>, mas <b>só se quantFunc &gt; 0</b> (divisão por zero!). Devolve <code>float</code>; quem mostra é o menu.</p></div>
+<pre class="code">/* g) Calcula e devolve a media dos vencimentos mensais */
+float mediaVencimentos(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int i;
+    float soma = 0, media = 0;
+
+    for (i = 0; i &lt; quantFunc; i++)
+    {
+        soma += vetor[i].vencimento;
+    }
+    if (quantFunc &gt; 0)
+    {
+        media = soma / quantFunc;
+    }
+    return media;
+}</pre>
+</article>
+<article class="card" id="al-h">
+<div class="qhead"><span class="qnum">Alínea h)</span><span class="chip">Percentagem com vencimento superior a 1000€</span></div>
+<p class="enun">Elaborar uma função que calcule, e apresente no monitor, a percentagem de funcionários com vencimento mensal superior a 1000€. Deverá também listar os dados desses funcionários.</p>
+<div class="exp"><strong>Como resolver</strong><ul><li>“Calcule e <b>apresente</b>” → a função é <code>void</code> e faz o <code>printf</code>.</li>
+<li>No mesmo ciclo conta e lista (reutiliza <code>mostraFuncionario</code>).</li>
+<li><code>(float) conta * 100 / quantFunc</code>: o cast evita a divisão inteira (1*100/3 daria 33 em vez de 33.33).</li>
+<li>“Superior” é <code>&gt;</code> (1000€ exatos não contam). <code>%%</code> no printf mostra o símbolo %.</li></ul></div>
+<pre class="code">/* h) Calcula e apresenta a percentagem de funcionarios com vencimento &gt; 1000 euros
+      e lista os dados desses funcionarios */
+void percentagemVencimentoSuperior(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int i, conta = 0;
+    float percentagem;
+
+    if (quantFunc == 0)
+    {
+        printf(&quot;\nNao existem funcionarios registados\n&quot;);
+    }
+    else
+    {
+        printf(&quot;\n Num.  Nome                      Vencimento   Admissao&quot;);
+        for (i = 0; i &lt; quantFunc; i++)
+        {
+            if (vetor[i].vencimento &gt; VENCIMENTO_REF)
+            {
+                mostraFuncionario(vetor[i]);
+                conta++;
+            }
+        }
+        percentagem = (float) conta * 100 / quantFunc;
+        printf(&quot;\n\nFuncionarios com vencimento superior a 1000 euros: %d (%.2f%%)\n&quot;, conta, percentagem);
+    }
+}</pre>
+</article>
+<article class="card" id="al-i">
+<div class="qhead"><span class="qnum">Alínea i)</span><span class="chip">Admitidos desde novembro de 2020 + ficheiro de texto</span></div>
+<p class="enun">Elaborar uma função que calcule, e devolva, a quantidade de funcionários admitidos desde novembro de 2020 (inclusive). Deverá também armazenar num ficheiro de texto os dados desses funcionários.</p>
+<div class="exp"><strong>Como resolver</strong><ul><li>Condição de data: <code>ano &gt; 2020</code> <b>ou</b> (<code>ano == 2020</code> <b>e</b> <code>mes &gt;= 11</code>). “Inclusive” → <code>&gt;= 11</code>.</li>
+<li>Ficheiro de texto: <code>fopen(..., "w")</code>, <code>fprintf</code> em vez de <code>printf</code>, <code>fclose</code>.</li>
+<li>Mesmo que o ficheiro não abra, a função continua a contar (o menu precisa do valor).</li>
+<li>Como o menu chama esta função a cada volta, o ficheiro fica sempre atualizado.</li></ul></div>
+<pre class="code">/* i) Calcula e devolve a quantidade de funcionarios admitidos desde novembro de 2020
+      (inclusive) e guarda os dados desses funcionarios num ficheiro de texto */
+int admitidosDesdeNov2020(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    FILE *ficheiro;
+    int i, conta = 0;
+    tipoData d;
+
+    ficheiro = fopen(FICH_TEXTO, &quot;w&quot;);
+    if (ficheiro == NULL)
+    {
+        printf(&quot;\nErro ao abrir o ficheiro %s\n&quot;, FICH_TEXTO);
+    }
+    else
+    {
+        fprintf(ficheiro, &quot;Funcionarios admitidos desde novembro de 2020\n&quot;);
+        fprintf(ficheiro, &quot;Numero\tNome\tVencimento\tData de admissao\n&quot;);
+    }
+
+    for (i = 0; i &lt; quantFunc; i++)
+    {
+        d = vetor[i].dataAdmissao;
+        if (d.ano &gt; 2020 || (d.ano == 2020 &amp;&amp; d.mes &gt;= 11))
+        {
+            conta++;
+            if (ficheiro != NULL)
+            {
+                fprintf(ficheiro, &quot;%d\t%s\t%.2f\t%02d/%02d/%04d\n&quot;, vetor[i].numero, vetor[i].nome,
+                        vetor[i].vencimento, d.dia, d.mes, d.ano);
+            }
+        }
+    }
+
+    if (ficheiro != NULL)
+    {
+        fprintf(ficheiro, &quot;Total: %d\n&quot;, conta);
+        fclose(ficheiro);
+    }
+    return conta;
+}</pre>
+</article>
+<article class="card" id="al-j">
+<div class="qhead"><span class="qnum">Alínea j)</span><span class="chip">Alterar o vencimento de um funcionário</span></div>
+<p class="enun">Elaborar uma função que altere o vencimento do funcionário com o número indicado pelo utilizador.</p>
+<div class="exp"><strong>Como resolver</strong><p>Pede o número, usa <code>procuraFuncionario()</code> (a mesma da alínea d) e, se existir, altera <code>vetor[pos].vencimento</code>. Como o vetor é passado por referência, a alteração fica no <code>main()</code> sem precisar de return.</p></div>
+<pre class="code">/* j) Altera o vencimento do funcionario com o numero indicado pelo utilizador */
+void alteraVencimento(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int numero, pos;
+
+    if (quantFunc == 0)
+    {
+        printf(&quot;\nNao existem funcionarios registados\n&quot;);
+    }
+    else
+    {
+        printf(&quot;Numero do funcionario: &quot;);
+        numero = lerInteiro(1, 9999);
+        pos = procuraFuncionario(vetor, quantFunc, numero);
+        if (pos == -1)
+        {
+            printf(&quot;\nNao existe nenhum funcionario com o numero %d\n&quot;, numero);
+        }
+        else
+        {
+            printf(&quot;Vencimento atual: %.2f euros\n&quot;, vetor[pos].vencimento);
+            printf(&quot;Novo vencimento (euros): &quot;);
+            vetor[pos].vencimento = lerFloat(0, 100000);
+        }
+    }
+}</pre>
+</article>
+<article class="card" id="al-k">
+<div class="qhead"><span class="qnum">Alínea k)</span><span class="chip">Escrever num ficheiro binário</span></div>
+<p class="enun">Elaborar uma função para escrever num ficheiro binário os dados de todos os funcionários.</p>
+<div class="exp"><strong>Como resolver</strong><p>Igual à Ficha 6: <code>"wb"</code> → <code>fwrite(&amp;quantFunc, sizeof(int), 1, f)</code> → <code>fwrite(vetor, sizeof(tipoFuncionario), quantFunc, f)</code> → <code>fclose</code>. O valor devolvido pelo <code>fwrite</code> é a quantidade escrita: serve para detetar erros.</p></div>
+<pre class="code">/* k) Escreve num ficheiro binario os dados de todos os funcionarios */
+void gravaFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    FILE *ficheiro;
+    int quant;
+
+    ficheiro = fopen(FICH_BINARIO, &quot;wb&quot;);
+    if (ficheiro == NULL)
+    {
+        printf(&quot;\nErro ao abrir o ficheiro %s\n&quot;, FICH_BINARIO);
+    }
+    else
+    {
+        quant = fwrite(&amp;quantFunc, sizeof(int), 1, ficheiro);
+        if (quant != 1)
+        {
+            printf(&quot;\nErro ao escrever no ficheiro\n&quot;);
+        }
+        else
+        {
+            quant = fwrite(vetor, sizeof(tipoFuncionario), quantFunc, ficheiro);
+            if (quant != quantFunc)
+            {
+                printf(&quot;\nErro ao escrever no ficheiro (%d de %d)\n&quot;, quant, quantFunc);
+            }
+            else
+            {
+                printf(&quot;\nDados de %d funcionarios gravados em %s\n&quot;, quantFunc, FICH_BINARIO);
+            }
+        }
+        fclose(ficheiro);
+    }
+}</pre>
+</article>
+<article class="card" id="al-l">
+<div class="qhead"><span class="qnum">Alínea l)</span><span class="chip">Ler do ficheiro binário</span></div>
+<p class="enun">Elaborar uma função para obter do ficheiro binário os dados dos funcionários.</p>
+<div class="exp"><strong>Como resolver</strong><p><code>"rb"</code>, lê primeiro a quantidade e depois o vetor (mesma ordem da escrita). Devolve a quantidade lida (0 se houver erro). Verificar também se a quantidade lida cabe no vetor (≤ 50) evita estragar a memória com um ficheiro corrompido.</p></div>
+<pre class="code">/* l) Obtem do ficheiro binario os dados dos funcionarios; devolve a quantidade lida */
+int leFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS])
+{
+    FILE *ficheiro;
+    int quantFunc = 0, quant;
+
+    ficheiro = fopen(FICH_BINARIO, &quot;rb&quot;);
+    if (ficheiro == NULL)
+    {
+        printf(&quot;\nErro ao abrir o ficheiro %s\n&quot;, FICH_BINARIO);
+    }
+    else
+    {
+        quant = fread(&amp;quantFunc, sizeof(int), 1, ficheiro);
+        if (quant != 1 || quantFunc &lt; 0 || quantFunc &gt; MAX_FUNCIONARIOS)
+        {
+            printf(&quot;\nErro ao ler do ficheiro\n&quot;);
+            quantFunc = 0;
+        }
+        else
+        {
+            quant = fread(vetor, sizeof(tipoFuncionario), quantFunc, ficheiro);
+            if (quant != quantFunc)
+            {
+                printf(&quot;\nErro ao ler do ficheiro (%d de %d)\n&quot;, quant, quantFunc);
+                quantFunc = 0;
+            }
+            else
+            {
+                printf(&quot;\nDados de %d funcionarios lidos de %s\n&quot;, quantFunc, FICH_BINARIO);
+            }
+        }
+        fclose(ficheiro);
+    }
+    return quantFunc;
+}</pre>
+</article>
+</section>
+
+<section class="tab" id="tab-codigo">
+  <div class="card">
+    <h2>main.c completo</h2>
+    <p class="note">Copia para o Code::Blocks (projeto “Console application” em C) ou descarrega o ficheiro. Não te esqueças de pôr o teu número e nome no topo.</p>
+    <div class="row">
+      <button class="btn" id="copyBtn" type="button">Copiar código</button>
+      <button class="btn ghost" id="dlBtn" type="button">Descarregar main.c</button>
+      <span class="note" id="copyMsg"></span>
+    </div>
+    <pre class="code" id="fullcode">/*
+ * Programacao I - Teste Pratico 1 (Treino)
+ * Gestao dos funcionarios de uma empresa
+ *
+ * Numero: ________     Nome: ______________________________
+ */
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+
+#define MAX_FUNCIONARIOS 50
+#define MAX_NOME 50
+#define VENCIMENTO_REF 1000.0
+#define FICH_BINARIO &quot;funcionarios.dat&quot;
+#define FICH_TEXTO &quot;admitidos.txt&quot;
+
+/* b) Tipos de dados */
+typedef struct
+{
+    int dia;
+    int mes;
+    int ano;
+} tipoData;
+
+typedef struct
+{
+    int numero;
+    char nome[MAX_NOME];
+    float vencimento;
+    tipoData dataAdmissao;
+} tipoFuncionario;
+
+/* Prototipos */
+char menu(int quantFunc, float mediaVenc, int quantAdmitidos);
+tipoFuncionario lerDadosFuncionario(void);
+int procuraFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc, int numero);
+int acrescentaFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);
+void mostraFuncionario(tipoFuncionario func);
+void mostraFuncionarios(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);
+float mediaVencimentos(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);
+void percentagemVencimentoSuperior(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);
+int admitidosDesdeNov2020(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);
+void alteraVencimento(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);
+void gravaFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);
+int leFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS]);
+
+/* Funcoes para leitura de dados (disponibilizadas nas aulas) */
+void limpaBufferStdin(void);
+int lerInteiro(int min, int max);
+float lerFloat(float min, float max);
+void lerString(char vetor[], int max);
+tipoData lerData(void);
+
+/* a) Estrutura do menu na funcao main() */
+int main(void)
+{
+    tipoFuncionario funcionarios[MAX_FUNCIONARIOS];   /* c) estrutura de dados */
+    int quantFunc = 0;
+    int quantAdmitidos;
+    float media;
+    char opcao;
+
+    do
+    {
+        media = mediaVencimentos(funcionarios, quantFunc);
+        quantAdmitidos = admitidosDesdeNov2020(funcionarios, quantFunc);
+        opcao = menu(quantFunc, media, quantAdmitidos);
+
+        switch (opcao)
+        {
+        case &#x27;N&#x27;:
+            quantFunc = acrescentaFuncionario(funcionarios, quantFunc);
+            break;
+        case &#x27;L&#x27;:
+            mostraFuncionarios(funcionarios, quantFunc);
+            break;
+        case &#x27;P&#x27;:
+            percentagemVencimentoSuperior(funcionarios, quantFunc);
+            break;
+        case &#x27;A&#x27;:
+            alteraVencimento(funcionarios, quantFunc);
+            break;
+        case &#x27;E&#x27;:
+            gravaFicheiroBinario(funcionarios, quantFunc);
+            break;
+        case &#x27;R&#x27;:
+            quantFunc = leFicheiroBinario(funcionarios);
+            break;
+        case &#x27;S&#x27;:
+            printf(&quot;\nFim do programa\n&quot;);
+            break;
+        default:
+            printf(&quot;\nOpcao invalida\n&quot;);
+        }
+    }
+    while (opcao != &#x27;S&#x27;);
+
+    return 0;
+}
+
+/* a) Menu de opcoes */
+char menu(int quantFunc, float mediaVenc, int quantAdmitidos)
+{
+    char op;
+
+    printf(&quot;\n\n************** Gestao de Funcionarios **************\n&quot;);
+    printf(&quot; Funcionarios: %d\t Media dos vencimentos: %.2f euros\n&quot;, quantFunc, mediaVenc);
+    printf(&quot; Admitidos desde novembro de 2020: %d\n&quot;, quantAdmitidos);
+    printf(&quot;\n N - Novo funcionario&quot;);
+    printf(&quot;\n L - Listar dados de funcionarios&quot;);
+    printf(&quot;\n P - Percentagem de funcionarios com vencimento superior a 1000 euros&quot;);
+    printf(&quot;\n A - Alterar vencimento de um funcionario&quot;);
+    printf(&quot;\n E - Escrever dados num ficheiro binario&quot;);
+    printf(&quot;\n R - Ler dados do ficheiro binario&quot;);
+    printf(&quot;\n S - Sair&quot;);
+    printf(&quot;\n\t Opcao --&gt; &quot;);
+
+    op = getchar();
+    op = toupper(op);
+    if (op != &#x27;\n&#x27; &amp;&amp; op != EOF)
+    {
+        limpaBufferStdin();
+    }
+    return op;
+}
+
+/* Obtem os dados de um funcionario */
+tipoFuncionario lerDadosFuncionario(void)
+{
+    tipoFuncionario func;
+
+    printf(&quot;Numero do funcionario (1 a 9999): &quot;);
+    func.numero = lerInteiro(1, 9999);
+
+    printf(&quot;Nome: &quot;);
+    lerString(func.nome, MAX_NOME);
+
+    printf(&quot;Vencimento mensal (euros): &quot;);
+    func.vencimento = lerFloat(0, 100000);
+
+    printf(&quot;Data de admissao:&quot;);
+    func.dataAdmissao = lerData();
+
+    return func;
+}
+
+/* Devolve a posicao do funcionario com esse numero, ou -1 se nao existir */
+int procuraFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc, int numero)
+{
+    int i, pos = -1;
+
+    for (i = 0; i &lt; quantFunc; i++)
+    {
+        if (vetor[i].numero == numero)
+        {
+            pos = i;
+            i = quantFunc;      /* termina a pesquisa */
+        }
+    }
+    return pos;
+}
+
+/* d) Acrescenta um funcionario com numero unico; devolve a nova quantidade */
+int acrescentaFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    tipoFuncionario func;
+
+    if (quantFunc == MAX_FUNCIONARIOS)
+    {
+        printf(&quot;\nImpossivel acrescentar: limite de %d funcionarios atingido\n&quot;, MAX_FUNCIONARIOS);
+    }
+    else
+    {
+        func = lerDadosFuncionario();
+        if (procuraFuncionario(vetor, quantFunc, func.numero) != -1)
+        {
+            printf(&quot;\nJa existe um funcionario com o numero %d - nao foi acrescentado\n&quot;, func.numero);
+        }
+        else
+        {
+            vetor[quantFunc] = func;
+            quantFunc++;
+        }
+    }
+    return quantFunc;
+}
+
+/* e) Mostra os dados de um funcionario */
+void mostraFuncionario(tipoFuncionario func)
+{
+    printf(&quot;\n %4d  %-25s %10.2f   %02d/%02d/%04d&quot;, func.numero, func.nome, func.vencimento,
+           func.dataAdmissao.dia, func.dataAdmissao.mes, func.dataAdmissao.ano);
+}
+
+/* f) Mostra os dados de todos os funcionarios */
+void mostraFuncionarios(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int i;
+
+    if (quantFunc == 0)
+    {
+        printf(&quot;\nNao existem funcionarios registados\n&quot;);
+    }
+    else
+    {
+        printf(&quot;\n Num.  Nome                      Vencimento   Admissao&quot;);
+        for (i = 0; i &lt; quantFunc; i++)
+        {
+            mostraFuncionario(vetor[i]);
+        }
+        printf(&quot;\n&quot;);
+    }
+}
+
+/* g) Calcula e devolve a media dos vencimentos mensais */
+float mediaVencimentos(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int i;
+    float soma = 0, media = 0;
+
+    for (i = 0; i &lt; quantFunc; i++)
+    {
+        soma += vetor[i].vencimento;
+    }
+    if (quantFunc &gt; 0)
+    {
+        media = soma / quantFunc;
+    }
+    return media;
+}
+
+/* h) Calcula e apresenta a percentagem de funcionarios com vencimento &gt; 1000 euros
+      e lista os dados desses funcionarios */
+void percentagemVencimentoSuperior(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int i, conta = 0;
+    float percentagem;
+
+    if (quantFunc == 0)
+    {
+        printf(&quot;\nNao existem funcionarios registados\n&quot;);
+    }
+    else
+    {
+        printf(&quot;\n Num.  Nome                      Vencimento   Admissao&quot;);
+        for (i = 0; i &lt; quantFunc; i++)
+        {
+            if (vetor[i].vencimento &gt; VENCIMENTO_REF)
+            {
+                mostraFuncionario(vetor[i]);
+                conta++;
+            }
+        }
+        percentagem = (float) conta * 100 / quantFunc;
+        printf(&quot;\n\nFuncionarios com vencimento superior a 1000 euros: %d (%.2f%%)\n&quot;, conta, percentagem);
+    }
+}
+
+/* i) Calcula e devolve a quantidade de funcionarios admitidos desde novembro de 2020
+      (inclusive) e guarda os dados desses funcionarios num ficheiro de texto */
+int admitidosDesdeNov2020(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    FILE *ficheiro;
+    int i, conta = 0;
+    tipoData d;
+
+    ficheiro = fopen(FICH_TEXTO, &quot;w&quot;);
+    if (ficheiro == NULL)
+    {
+        printf(&quot;\nErro ao abrir o ficheiro %s\n&quot;, FICH_TEXTO);
+    }
+    else
+    {
+        fprintf(ficheiro, &quot;Funcionarios admitidos desde novembro de 2020\n&quot;);
+        fprintf(ficheiro, &quot;Numero\tNome\tVencimento\tData de admissao\n&quot;);
+    }
+
+    for (i = 0; i &lt; quantFunc; i++)
+    {
+        d = vetor[i].dataAdmissao;
+        if (d.ano &gt; 2020 || (d.ano == 2020 &amp;&amp; d.mes &gt;= 11))
+        {
+            conta++;
+            if (ficheiro != NULL)
+            {
+                fprintf(ficheiro, &quot;%d\t%s\t%.2f\t%02d/%02d/%04d\n&quot;, vetor[i].numero, vetor[i].nome,
+                        vetor[i].vencimento, d.dia, d.mes, d.ano);
+            }
+        }
+    }
+
+    if (ficheiro != NULL)
+    {
+        fprintf(ficheiro, &quot;Total: %d\n&quot;, conta);
+        fclose(ficheiro);
+    }
+    return conta;
+}
+
+/* j) Altera o vencimento do funcionario com o numero indicado pelo utilizador */
+void alteraVencimento(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int numero, pos;
+
+    if (quantFunc == 0)
+    {
+        printf(&quot;\nNao existem funcionarios registados\n&quot;);
+    }
+    else
+    {
+        printf(&quot;Numero do funcionario: &quot;);
+        numero = lerInteiro(1, 9999);
+        pos = procuraFuncionario(vetor, quantFunc, numero);
+        if (pos == -1)
+        {
+            printf(&quot;\nNao existe nenhum funcionario com o numero %d\n&quot;, numero);
+        }
+        else
+        {
+            printf(&quot;Vencimento atual: %.2f euros\n&quot;, vetor[pos].vencimento);
+            printf(&quot;Novo vencimento (euros): &quot;);
+            vetor[pos].vencimento = lerFloat(0, 100000);
+        }
+    }
+}
+
+/* k) Escreve num ficheiro binario os dados de todos os funcionarios */
+void gravaFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    FILE *ficheiro;
+    int quant;
+
+    ficheiro = fopen(FICH_BINARIO, &quot;wb&quot;);
+    if (ficheiro == NULL)
+    {
+        printf(&quot;\nErro ao abrir o ficheiro %s\n&quot;, FICH_BINARIO);
+    }
+    else
+    {
+        quant = fwrite(&amp;quantFunc, sizeof(int), 1, ficheiro);
+        if (quant != 1)
+        {
+            printf(&quot;\nErro ao escrever no ficheiro\n&quot;);
+        }
+        else
+        {
+            quant = fwrite(vetor, sizeof(tipoFuncionario), quantFunc, ficheiro);
+            if (quant != quantFunc)
+            {
+                printf(&quot;\nErro ao escrever no ficheiro (%d de %d)\n&quot;, quant, quantFunc);
+            }
+            else
+            {
+                printf(&quot;\nDados de %d funcionarios gravados em %s\n&quot;, quantFunc, FICH_BINARIO);
+            }
+        }
+        fclose(ficheiro);
+    }
+}
+
+/* l) Obtem do ficheiro binario os dados dos funcionarios; devolve a quantidade lida */
+int leFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS])
+{
+    FILE *ficheiro;
+    int quantFunc = 0, quant;
+
+    ficheiro = fopen(FICH_BINARIO, &quot;rb&quot;);
+    if (ficheiro == NULL)
+    {
+        printf(&quot;\nErro ao abrir o ficheiro %s\n&quot;, FICH_BINARIO);
+    }
+    else
+    {
+        quant = fread(&amp;quantFunc, sizeof(int), 1, ficheiro);
+        if (quant != 1 || quantFunc &lt; 0 || quantFunc &gt; MAX_FUNCIONARIOS)
+        {
+            printf(&quot;\nErro ao ler do ficheiro\n&quot;);
+            quantFunc = 0;
+        }
+        else
+        {
+            quant = fread(vetor, sizeof(tipoFuncionario), quantFunc, ficheiro);
+            if (quant != quantFunc)
+            {
+                printf(&quot;\nErro ao ler do ficheiro (%d de %d)\n&quot;, quant, quantFunc);
+                quantFunc = 0;
+            }
+            else
+            {
+                printf(&quot;\nDados de %d funcionarios lidos de %s\n&quot;, quantFunc, FICH_BINARIO);
+            }
+        }
+        fclose(ficheiro);
+    }
+    return quantFunc;
+}
+
+/************ Funcoes para leitura de dados ************/
+
+void limpaBufferStdin(void)
+{
+    int lixo;
+
+    do
+    {
+        lixo = getchar();
+    }
+    while (lixo != &#x27;\n&#x27; &amp;&amp; lixo != EOF);
+}
+
+int lerInteiro(int min, int max)
+{
+    int numero = 0, controlo;
+
+    do
+    {
+        controlo = scanf(&quot;%d&quot;, &amp;numero);
+        limpaBufferStdin();
+    }
+    while (numero &lt; min || numero &gt; max || controlo == 0);
+
+    return numero;
+}
+
+float lerFloat(float min, float max)
+{
+    float numero = 0;
+    int controlo;
+
+    do
+    {
+        controlo = scanf(&quot;%f&quot;, &amp;numero);
+        limpaBufferStdin();
+    }
+    while (numero &lt; min || numero &gt; max || controlo == 0);
+
+    return numero;
+}
+
+void lerString(char vetor[], int max)
+{
+    int tamanhoString;
+
+    do
+    {
+        fgets(vetor, max, stdin);
+        tamanhoString = strlen(vetor);
+    }
+    while (tamanhoString == 1);    /* repete se so foi introduzido o \n */
+
+    if (vetor[tamanhoString - 1] != &#x27;\n&#x27;)
+    {
+        limpaBufferStdin();
+    }
+    else
+    {
+        vetor[tamanhoString - 1] = &#x27;\0&#x27;;
+    }
+}
+
+tipoData lerData(void)
+{
+    tipoData data;
+    int maxDiaMes;
+
+    printf(&quot;\n Ano (%d a %d): &quot;, 1950, 2026);
+    data.ano = lerInteiro(1950, 2026);
+
+    printf(&quot; Mes (%d a %d): &quot;, 1, 12);
+    data.mes = lerInteiro(1, 12);
+
+    switch (data.mes)
+    {
+    case 2:
+        if ((data.ano % 400 == 0) || (data.ano % 4 == 0 &amp;&amp; data.ano % 100 != 0))
+        {
+            maxDiaMes = 29;
+        }
+        else
+        {
+            maxDiaMes = 28;
+        }
+        break;
+    case 4:
+    case 6:
+    case 9:
+    case 11:
+        maxDiaMes = 30;
+        break;
+    default:
+        maxDiaMes = 31;
+    }
+    printf(&quot; Dia (%d a %d): &quot;, 1, maxDiaMes);
+    data.dia = lerInteiro(1, maxDiaMes);
+
+    return data;
+}
+</pre>
+  </div>
+</section>
+
+<section class="tab" id="tab-variantes">
+  <div class="card">
+    <h2>Variantes para treinar</h2>
+    <p style="margin:0">No teste real a empresa/entidade e as condições podem mudar. Estas são as variações mais prováveis, no estilo das fichas. Tenta fazer cada uma no Code::Blocks antes de abrir a solução. Todas foram compiladas e testadas juntamente com o <code>main.c</code>.</p>
+  </div>
+  <article class="card hidden-sol" id="var-1">
+<div class="qhead"><span class="qnum">Variante 1</span><span class="chip">Comparar duas datas</span></div>
+<p class="enun">Elabore uma função que compare duas datas e devolva -1 se a primeira for anterior, 0 se forem iguais e 1 se for posterior.</p>
+<p class="note">Tenta escrever primeiro no Code::Blocks. Dica: Compara primeiro o ano, depois o mês, depois o dia. Serve para qualquer condição “desde/antes de uma data”.</p>
+<button class="btn ghost reveal" type="button">Ver solução</button>
+<div class="solbox"><pre class="code">/* Devolve -1 se d1 for anterior a d2, 0 se forem iguais, 1 se d1 for posterior */
+int comparaDatas(tipoData d1, tipoData d2)
+{
+    int resultado = 0;
+
+    if (d1.ano != d2.ano)
+    {
+        resultado = (d1.ano &lt; d2.ano) ? -1 : 1;
+    }
+    else if (d1.mes != d2.mes)
+    {
+        resultado = (d1.mes &lt; d2.mes) ? -1 : 1;
+    }
+    else if (d1.dia != d2.dia)
+    {
+        resultado = (d1.dia &lt; d2.dia) ? -1 : 1;
+    }
+    return resultado;
+}</pre></div>
+</article>
+<article class="card hidden-sol" id="var-2">
+<div class="qhead"><span class="qnum">Variante 2</span><span class="chip">Funcionário com maior vencimento</span></div>
+<p class="enun">Elabore uma função que devolva a posição do funcionário com maior vencimento.</p>
+<p class="note">Tenta escrever primeiro no Code::Blocks. Dica: Começa por assumir que o maior é o da posição 0 e compara com os seguintes.</p>
+<button class="btn ghost reveal" type="button">Ver solução</button>
+<div class="solbox"><pre class="code">/* Devolve a posicao do funcionario com maior vencimento (-1 se nao houver) */
+int maiorVencimento(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int i, pos = -1;
+
+    if (quantFunc &gt; 0)
+    {
+        pos = 0;
+        for (i = 1; i &lt; quantFunc; i++)
+        {
+            if (vetor[i].vencimento &gt; vetor[pos].vencimento)
+            {
+                pos = i;
+            }
+        }
+    }
+    return pos;
+}</pre></div>
+</article>
+<article class="card hidden-sol" id="var-3">
+<div class="qhead"><span class="qnum">Variante 3</span><span class="chip">Eliminar funcionário</span></div>
+<p class="enun">Elabore uma função que elimine o funcionário com o número indicado pelo utilizador.</p>
+<p class="note">Tenta escrever primeiro no Code::Blocks. Dica: Procura a posição e “puxa” os seguintes uma posição para trás; devolve quantFunc - 1.</p>
+<button class="btn ghost reveal" type="button">Ver solução</button>
+<div class="solbox"><pre class="code">/* Elimina o funcionario com o numero indicado; devolve a nova quantidade */
+int eliminaFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int numero, pos, i;
+
+    printf(&quot;Numero do funcionario a eliminar: &quot;);
+    numero = lerInteiro(1, 9999);
+    pos = procuraFuncionario(vetor, quantFunc, numero);
+
+    if (pos == -1)
+    {
+        printf(&quot;\nNao existe nenhum funcionario com o numero %d\n&quot;, numero);
+    }
+    else
+    {
+        for (i = pos; i &lt; quantFunc - 1; i++)    /* puxa os seguintes uma posicao para tras */
+        {
+            vetor[i] = vetor[i + 1];
+        }
+        quantFunc--;
+        printf(&quot;\nFuncionario %d eliminado\n&quot;, numero);
+    }
+    return quantFunc;
+}</pre></div>
+</article>
+<article class="card hidden-sol" id="var-4">
+<div class="qhead"><span class="qnum">Variante 4</span><span class="chip">Procurar por nome</span></div>
+<p class="enun">Elabore uma função que liste os funcionários cujo nome contém um texto indicado pelo utilizador.</p>
+<p class="note">Tenta escrever primeiro no Code::Blocks. Dica: <code>strstr</code> procura um texto dentro de outro (<code>&lt;string.h&gt;</code>). Para nome exato: <code>strcmp(a, b) == 0</code>.</p>
+<button class="btn ghost reveal" type="button">Ver solução</button>
+<div class="solbox"><pre class="code">/* Lista os funcionarios cujo nome contem o texto indicado */
+void procuraPorNome(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    char texto[MAX_NOME];
+    int i, encontrados = 0;
+
+    printf(&quot;Nome (ou parte do nome) a procurar: &quot;);
+    lerString(texto, MAX_NOME);
+
+    for (i = 0; i &lt; quantFunc; i++)
+    {
+        if (strstr(vetor[i].nome, texto) != NULL)   /* strcmp(...) == 0 para nome exato */
+        {
+            mostraFuncionario(vetor[i]);
+            encontrados++;
+        }
+    }
+    printf(&quot;\n%d funcionario(s) encontrado(s)\n&quot;, encontrados);
+}</pre></div>
+</article>
+<article class="card hidden-sol" id="var-5">
+<div class="qhead"><span class="qnum">Variante 5</span><span class="chip">Aumentar vencimentos</span></div>
+<p class="enun">Elabore uma função que aumente X% o vencimento dos funcionários admitidos antes de uma data indicada pelo utilizador.</p>
+<p class="note">Tenta escrever primeiro no Code::Blocks. Dica: Novo = antigo × (1 + X/100). Usa a variante 1 para comparar datas.</p>
+<button class="btn ghost reveal" type="button">Ver solução</button>
+<div class="solbox"><pre class="code">/* Aumenta X% o vencimento dos funcionarios admitidos antes de uma data indicada */
+void aumentaVencimentos(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    float percentagem;
+    tipoData limite;
+    int i, alterados = 0;
+
+    printf(&quot;Percentagem de aumento: &quot;);
+    percentagem = lerFloat(0, 100);
+    printf(&quot;Aumentar os admitidos antes de:&quot;);
+    limite = lerData();
+
+    for (i = 0; i &lt; quantFunc; i++)
+    {
+        if (comparaDatas(vetor[i].dataAdmissao, limite) &lt; 0)
+        {
+            vetor[i].vencimento = vetor[i].vencimento * (1 + percentagem / 100);
+            alterados++;
+        }
+    }
+    printf(&quot;\n%d vencimento(s) atualizado(s)\n&quot;, alterados);
+}</pre></div>
+</article>
+<article class="card hidden-sol" id="var-6">
+<div class="qhead"><span class="qnum">Variante 6</span><span class="chip">Ordenar por vencimento</span></div>
+<p class="enun">Elabore uma função que ordene os funcionários por vencimento (do maior para o menor).</p>
+<p class="note">Tenta escrever primeiro no Code::Blocks. Dica: Bubble sort: troca vizinhos fora de ordem usando uma variável auxiliar do tipo struct.</p>
+<button class="btn ghost reveal" type="button">Ver solução</button>
+<div class="solbox"><pre class="code">/* Ordena o vetor por vencimento (decrescente) - bubble sort */
+void ordenaPorVencimento(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    int i, j;
+    tipoFuncionario aux;
+
+    for (i = 0; i &lt; quantFunc - 1; i++)
+    {
+        for (j = 0; j &lt; quantFunc - 1 - i; j++)
+        {
+            if (vetor[j].vencimento &lt; vetor[j + 1].vencimento)
+            {
+                aux = vetor[j];
+                vetor[j] = vetor[j + 1];
+                vetor[j + 1] = aux;
+            }
+        }
+    }
+}</pre></div>
+</article>
+<article class="card hidden-sol" id="var-7">
+<div class="qhead"><span class="qnum">Variante 7</span><span class="chip">Admitidos num ano</span></div>
+<p class="enun">Elabore uma função que devolva a quantidade de funcionários admitidos num ano recebido por parâmetro.</p>
+<p class="note">Tenta escrever primeiro no Code::Blocks. Dica: Conta com um ciclo e um if; devolve o contador.</p>
+<button class="btn ghost reveal" type="button">Ver solução</button>
+<div class="solbox"><pre class="code">/* Conta os funcionarios admitidos num determinado ano */
+int admitidosNoAno(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc, int ano)
+{
+    int i, conta = 0;
+
+    for (i = 0; i &lt; quantFunc; i++)
+    {
+        if (vetor[i].dataAdmissao.ano == ano)
+        {
+            conta++;
+        }
+    }
+    return conta;
+}</pre></div>
+</article>
+<article class="card hidden-sol" id="var-8">
+<div class="qhead"><span class="qnum">Variante 8</span><span class="chip">Ficheiro de texto com todos</span></div>
+<p class="enun">Elabore uma função que escreva num ficheiro de texto os dados de todos os funcionários.</p>
+<p class="note">Tenta escrever primeiro no Code::Blocks. Dica: Igual à alínea i) mas sem condição.</p>
+<button class="btn ghost reveal" type="button">Ver solução</button>
+<div class="solbox"><pre class="code">/* Escreve num ficheiro de texto os dados de todos os funcionarios */
+void gravaFicheiroTexto(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)
+{
+    FILE *ficheiro;
+    int i;
+
+    ficheiro = fopen(&quot;funcionarios.txt&quot;, &quot;w&quot;);
+    if (ficheiro == NULL)
+    {
+        printf(&quot;\nErro ao abrir o ficheiro\n&quot;);
+    }
+    else
+    {
+        fprintf(ficheiro, &quot;Total de funcionarios: %d\n&quot;, quantFunc);
+        for (i = 0; i &lt; quantFunc; i++)
+        {
+            fprintf(ficheiro, &quot;%d\t%s\t%.2f\t%02d/%02d/%04d\n&quot;, vetor[i].numero, vetor[i].nome,
+                    vetor[i].vencimento, vetor[i].dataAdmissao.dia,
+                    vetor[i].dataAdmissao.mes, vetor[i].dataAdmissao.ano);
+        }
+        fclose(ficheiro);
+    }
+}</pre></div>
+</article>
+<article class="card hidden-sol" id="var-9">
+<div class="qhead"><span class="qnum">Variante 9</span><span class="chip">Ler binário com ponteiro</span></div>
+<p class="enun">Escreva uma versão da alínea l) que devolva a quantidade lida através de um parâmetro (ponteiro).</p>
+<p class="note">Tenta escrever primeiro no Code::Blocks. Dica: <code>*quantFunc = 0;</code> e <code>fread(quantFunc, ...)</code> — quantFunc já é um endereço.</p>
+<button class="btn ghost reveal" type="button">Ver solução</button>
+<div class="solbox"><pre class="code">/* Versao alternativa da alinea l): devolve a quantidade por ponteiro */
+void leFicheiroBinarioAlt(tipoFuncionario vetor[MAX_FUNCIONARIOS], int *quantFunc)
+{
+    FILE *ficheiro;
+
+    *quantFunc = 0;
+    ficheiro = fopen(&quot;funcionarios.dat&quot;, &quot;rb&quot;);
+    if (ficheiro == NULL)
+    {
+        printf(&quot;\nErro ao abrir o ficheiro\n&quot;);
+    }
+    else
+    {
+        fread(quantFunc, sizeof(int), 1, ficheiro);
+        fread(vetor, sizeof(tipoFuncionario), *quantFunc, ficheiro);
+        fclose(ficheiro);
+    }
+}</pre></div>
+</article>
+</section>
+
+<section class="tab" id="tab-estrategia">
+  <div class="card">
+    <h2>Plano para as 2h30</h2>
+    <ol>
+      <li><b>(5 min)</b> Ler o enunciado todo. Sublinhar: limite máximo, campos da struct, condições (“superior”, “desde … inclusive”), o que é “devolver” vs “apresentar”.</li>
+      <li><b>(10 min)</b> Criar o projeto, pôr número e nome no topo, copiar <code>limpaBufferStdin</code>, <code>lerInteiro</code>, <code>lerFloat</code>, <code>lerString</code>, <code>lerData</code> da Ficha 6. <b>Compilar.</b></li>
+      <li><b>(10 min)</b> Alíneas b) e c): <code>#define</code>, <code>tipoData</code>, struct, vetor + contador no <code>main</code>. <b>Compilar.</b></li>
+      <li><b>(15 min)</b> Alínea a): <code>menu()</code> + <code>do…while</code> + <code>switch</code> no <code>main</code>, com os cases ainda vazios. <b>Compilar e correr.</b></li>
+      <li><b>(25 min)</b> d), e), f): acrescentar (com <code>procura</code>), mostrar um, mostrar todos. Testar inserindo 2–3 funcionários e um número repetido.</li>
+      <li><b>(20 min)</b> g), h), i): média, percentagem, contagem por data + ficheiro de texto. Testar casos-limite (1000€ exatos, outubro vs novembro de 2020).</li>
+      <li><b>(15 min)</b> j), k), l): alterar, gravar e ler binário. Testar: gravar → sair → abrir → ler.</li>
+      <li><b>(resto)</b> Rever: compila sem erros? Cada função tem protótipo? Menu atualizado? Entregar a tempo.</li>
+    </ol>
+    <div class="trap"><b>O mais importante do aviso:</b> “O programa entregue deverá compilar com sucesso”. Compila a cada função nova. Se algo não funcionar perto do fim, comenta essa parte (<code>/* … */</code>) em vez de entregar código que não compila.</div>
+  </div>
+
+  <div class="card">
+    <h2>Regras dos slides e das fichas — verificação do código</h2>
+    <div class="tablewrap"><table>
+      <tr><th>Regra (slides de Prog I / Ficha 6 / avisos do teste)</th><th>No main.c</th></tr>
+      <tr><td>Identificação (número e nome) no início do ficheiro</td><td class="ok">✔ comentário no topo (preencher)</td></tr>
+      <tr><td>Estrutura do programa: <code>#include</code> → <code>#define</code> → tipos → protótipos → <code>main</code> → implementação das funções</td><td class="ok">✔ por esta ordem</td></tr>
+      <tr><td>Usar constantes (<code>#define</code>, sem <code>;</code> no fim) em vez de números “mágicos”</td><td class="ok">✔ MAX_FUNCIONARIOS, MAX_NOME, VENCIMENTO_REF, nomes dos ficheiros</td></tr>
+      <tr><td>Estruturas declaradas antes do <code>main</code>, com <code>typedef</code>; estruturas compostas (data dentro do funcionário)</td><td class="ok">✔ tipoData e tipoFuncionario</td></tr>
+      <tr><td>Todas as funções com protótipo antes do <code>main</code>; nomes que dizem o que a função faz</td><td class="ok">✔ (o <code>-Wmissing-declarations</code> confirma)</td></tr>
+      <tr><td>Variáveis declaradas no início de cada função, logo a seguir à <code>{</code>; sem variáveis globais</td><td class="ok">✔</td></tr>
+      <tr><td><code>void</code> quando a função não devolve nada; <code>return</code> quando devolve</td><td class="ok">✔ (g e i devolvem; e, f, h, j, k são void)</td></tr>
+      <tr><td>Struct passada por valor quando só se lê (mostrar); vetor de structs passa por referência</td><td class="ok">✔ mostraFuncionario(tipoFuncionario func); funções do vetor alteram o original</td></tr>
+      <tr><td>Parâmetro vetor com o tamanho, como na Ficha 6 (<code>vetor[MAX_…]</code>)</td><td class="ok">✔</td></tr>
+      <tr><td>Strings sem <code>&amp;</code>; leitura com <code>lerString</code> (fgets) e não <code>scanf("%s")</code></td><td class="ok">✔</td></tr>
+      <tr><td>Usar as funções de leitura disponibilizadas (lerInteiro, lerFloat, lerString, lerData)</td><td class="ok">✔ todas as leituras passam por elas</td></tr>
+      <tr><td>Cast <code>(float)</code> para evitar divisão inteira; evitar divisão por zero</td><td class="ok">✔ média e percentagem</td></tr>
+      <tr><td>Ficheiros: verificar <code>fp == NULL</code>, <code>fclose</code>; binário "wb"/"rb" (quantidade + vetor); texto "w" + <code>fprintf</code></td><td class="ok">✔ e verifica o valor devolvido por fwrite/fread</td></tr>
+      <tr><td>Menu: opção em letra com <code>toupper</code>, <code>limpaBufferStdin</code>, <code>switch</code> com <code>break</code> e <code>default</code> “Opcao invalida”</td><td class="ok">✔</td></tr>
+      <tr><td>Indentação correta e comentários a identificar cada alínea</td><td class="ok">✔</td></tr>
+      <tr><td>Compila sem erros no gcc (Code::Blocks) com os avisos ativados</td><td class="ok">✔ 0 erros, 0 avisos</td></tr>
+    </table></div>
+    <p class="note">Dois pormenores diferentes da Ficha 6, ambos de propósito: o <code>menu()</code> só chama <code>limpaBufferStdin()</code> se o carácter lido não for já o Enter (senão, carregar só Enter ficava à espera de outra linha); e o <code>leFicheiroBinario()</code> confirma que a quantidade lida não passa de 50 antes de ler o vetor.</p>
+  </div>
+
+  <div class="card">
+    <h2>Erros que fazem perder mais pontos</h2>
+    <ul>
+      <li>Esquecer <code>quantFunc = acrescentaFuncionario(...)</code> (sem guardar o valor devolvido, o funcionário “desaparece”).</li>
+      <li>Ciclos até <code>MAX_FUNCIONARIOS</code> em vez de até <code>quantFunc</code> (mostra lixo).</li>
+      <li><code>conta * 100 / quant</code> sem cast → percentagem inteira (33 em vez de 33.33).</li>
+      <li>“Superior a 1000” com <code>&gt;=</code>; “desde novembro de 2020 inclusive” só com <code>ano &gt;= 2020</code> (conta janeiro a outubro de 2020).</li>
+      <li><code>scanf("%s")</code> para nomes (corta no espaço) — usa <code>lerString</code>.</li>
+      <li><code>fopen</code> com "w"/"r" no binário, ou ler pela ordem errada (primeiro a quantidade, depois o vetor).</li>
+      <li>Falta de protótipo ou de <code>#include &lt;string.h&gt;</code> / <code>&lt;ctype.h&gt;</code>.</li>
+      <li>Repetir código em vez de reutilizar funções (procura, mostraFuncionario).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Code::Blocks: ativar os avisos (guia da consulta)</h2>
+    <p>Menu <b>Settings → Compiler → Compiler flags</b> (Warnings), ativar:</p>
+    <ul>
+      <li>Enable all common compiler warnings <code>[-Wall]</code></li>
+      <li>Enable extra compiler warnings <code>[-Wextra]</code></li>
+      <li>Enable warnings demanded by strict ISO C <code>[-pedantic]</code></li>
+      <li>Warn if a global function is defined without a previous declaration <code>[-Wmissing-declarations]</code></li>
+      <li>Warn if anything is declared more than once in the same scope <code>[-Wredundant-decls]</code></li>
+      <li>Warn if floating point values are used in equality comparisons <code>[-Wfloat-equal]</code></li>
+      <li>Warn if main() is not conformant <code>[-Wmain]</code></li>
+      <li>Warn whenever a local variable shadows another <code>[-Wshadow]</code></li>
+    </ul>
+    <div class="tip">Os ficheiros (<code>funcionarios.dat</code>, <code>admitidos.txt</code>) são criados na pasta do projeto quando corres o programa a partir do Code::Blocks.</div>
+  </div>
+</section>
+</div>
+
+<script>
+"use strict";
+const SRC = "/*\n * Programacao I - Teste Pratico 1 (Treino)\n * Gestao dos funcionarios de uma empresa\n *\n * Numero: ________     Nome: ______________________________\n */\n\n#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\n#define MAX_FUNCIONARIOS 50\n#define MAX_NOME 50\n#define VENCIMENTO_REF 1000.0\n#define FICH_BINARIO \"funcionarios.dat\"\n#define FICH_TEXTO \"admitidos.txt\"\n\n/* b) Tipos de dados */\ntypedef struct\n{\n    int dia;\n    int mes;\n    int ano;\n} tipoData;\n\ntypedef struct\n{\n    int numero;\n    char nome[MAX_NOME];\n    float vencimento;\n    tipoData dataAdmissao;\n} tipoFuncionario;\n\n/* Prototipos */\nchar menu(int quantFunc, float mediaVenc, int quantAdmitidos);\ntipoFuncionario lerDadosFuncionario(void);\nint procuraFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc, int numero);\nint acrescentaFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);\nvoid mostraFuncionario(tipoFuncionario func);\nvoid mostraFuncionarios(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);\nfloat mediaVencimentos(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);\nvoid percentagemVencimentoSuperior(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);\nint admitidosDesdeNov2020(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);\nvoid alteraVencimento(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);\nvoid gravaFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc);\nint leFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS]);\n\n/* Funcoes para leitura de dados (disponibilizadas nas aulas) */\nvoid limpaBufferStdin(void);\nint lerInteiro(int min, int max);\nfloat lerFloat(float min, float max);\nvoid lerString(char vetor[], int max);\ntipoData lerData(void);\n\n/* a) Estrutura do menu na funcao main() */\nint main(void)\n{\n    tipoFuncionario funcionarios[MAX_FUNCIONARIOS];   /* c) estrutura de dados */\n    int quantFunc = 0;\n    int quantAdmitidos;\n    float media;\n    char opcao;\n\n    do\n    {\n        media = mediaVencimentos(funcionarios, quantFunc);\n        quantAdmitidos = admitidosDesdeNov2020(funcionarios, quantFunc);\n        opcao = menu(quantFunc, media, quantAdmitidos);\n\n        switch (opcao)\n        {\n        case 'N':\n            quantFunc = acrescentaFuncionario(funcionarios, quantFunc);\n            break;\n        case 'L':\n            mostraFuncionarios(funcionarios, quantFunc);\n            break;\n        case 'P':\n            percentagemVencimentoSuperior(funcionarios, quantFunc);\n            break;\n        case 'A':\n            alteraVencimento(funcionarios, quantFunc);\n            break;\n        case 'E':\n            gravaFicheiroBinario(funcionarios, quantFunc);\n            break;\n        case 'R':\n            quantFunc = leFicheiroBinario(funcionarios);\n            break;\n        case 'S':\n            printf(\"\\nFim do programa\\n\");\n            break;\n        default:\n            printf(\"\\nOpcao invalida\\n\");\n        }\n    }\n    while (opcao != 'S');\n\n    return 0;\n}\n\n/* a) Menu de opcoes */\nchar menu(int quantFunc, float mediaVenc, int quantAdmitidos)\n{\n    char op;\n\n    printf(\"\\n\\n************** Gestao de Funcionarios **************\\n\");\n    printf(\" Funcionarios: %d\\t Media dos vencimentos: %.2f euros\\n\", quantFunc, mediaVenc);\n    printf(\" Admitidos desde novembro de 2020: %d\\n\", quantAdmitidos);\n    printf(\"\\n N - Novo funcionario\");\n    printf(\"\\n L - Listar dados de funcionarios\");\n    printf(\"\\n P - Percentagem de funcionarios com vencimento superior a 1000 euros\");\n    printf(\"\\n A - Alterar vencimento de um funcionario\");\n    printf(\"\\n E - Escrever dados num ficheiro binario\");\n    printf(\"\\n R - Ler dados do ficheiro binario\");\n    printf(\"\\n S - Sair\");\n    printf(\"\\n\\t Opcao --> \");\n\n    op = getchar();\n    op = toupper(op);\n    if (op != '\\n' && op != EOF)\n    {\n        limpaBufferStdin();\n    }\n    return op;\n}\n\n/* Obtem os dados de um funcionario */\ntipoFuncionario lerDadosFuncionario(void)\n{\n    tipoFuncionario func;\n\n    printf(\"Numero do funcionario (1 a 9999): \");\n    func.numero = lerInteiro(1, 9999);\n\n    printf(\"Nome: \");\n    lerString(func.nome, MAX_NOME);\n\n    printf(\"Vencimento mensal (euros): \");\n    func.vencimento = lerFloat(0, 100000);\n\n    printf(\"Data de admissao:\");\n    func.dataAdmissao = lerData();\n\n    return func;\n}\n\n/* Devolve a posicao do funcionario com esse numero, ou -1 se nao existir */\nint procuraFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc, int numero)\n{\n    int i, pos = -1;\n\n    for (i = 0; i < quantFunc; i++)\n    {\n        if (vetor[i].numero == numero)\n        {\n            pos = i;\n            i = quantFunc;      /* termina a pesquisa */\n        }\n    }\n    return pos;\n}\n\n/* d) Acrescenta um funcionario com numero unico; devolve a nova quantidade */\nint acrescentaFuncionario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)\n{\n    tipoFuncionario func;\n\n    if (quantFunc == MAX_FUNCIONARIOS)\n    {\n        printf(\"\\nImpossivel acrescentar: limite de %d funcionarios atingido\\n\", MAX_FUNCIONARIOS);\n    }\n    else\n    {\n        func = lerDadosFuncionario();\n        if (procuraFuncionario(vetor, quantFunc, func.numero) != -1)\n        {\n            printf(\"\\nJa existe um funcionario com o numero %d - nao foi acrescentado\\n\", func.numero);\n        }\n        else\n        {\n            vetor[quantFunc] = func;\n            quantFunc++;\n        }\n    }\n    return quantFunc;\n}\n\n/* e) Mostra os dados de um funcionario */\nvoid mostraFuncionario(tipoFuncionario func)\n{\n    printf(\"\\n %4d  %-25s %10.2f   %02d/%02d/%04d\", func.numero, func.nome, func.vencimento,\n           func.dataAdmissao.dia, func.dataAdmissao.mes, func.dataAdmissao.ano);\n}\n\n/* f) Mostra os dados de todos os funcionarios */\nvoid mostraFuncionarios(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)\n{\n    int i;\n\n    if (quantFunc == 0)\n    {\n        printf(\"\\nNao existem funcionarios registados\\n\");\n    }\n    else\n    {\n        printf(\"\\n Num.  Nome                      Vencimento   Admissao\");\n        for (i = 0; i < quantFunc; i++)\n        {\n            mostraFuncionario(vetor[i]);\n        }\n        printf(\"\\n\");\n    }\n}\n\n/* g) Calcula e devolve a media dos vencimentos mensais */\nfloat mediaVencimentos(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)\n{\n    int i;\n    float soma = 0, media = 0;\n\n    for (i = 0; i < quantFunc; i++)\n    {\n        soma += vetor[i].vencimento;\n    }\n    if (quantFunc > 0)\n    {\n        media = soma / quantFunc;\n    }\n    return media;\n}\n\n/* h) Calcula e apresenta a percentagem de funcionarios com vencimento > 1000 euros\n      e lista os dados desses funcionarios */\nvoid percentagemVencimentoSuperior(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)\n{\n    int i, conta = 0;\n    float percentagem;\n\n    if (quantFunc == 0)\n    {\n        printf(\"\\nNao existem funcionarios registados\\n\");\n    }\n    else\n    {\n        printf(\"\\n Num.  Nome                      Vencimento   Admissao\");\n        for (i = 0; i < quantFunc; i++)\n        {\n            if (vetor[i].vencimento > VENCIMENTO_REF)\n            {\n                mostraFuncionario(vetor[i]);\n                conta++;\n            }\n        }\n        percentagem = (float) conta * 100 / quantFunc;\n        printf(\"\\n\\nFuncionarios com vencimento superior a 1000 euros: %d (%.2f%%)\\n\", conta, percentagem);\n    }\n}\n\n/* i) Calcula e devolve a quantidade de funcionarios admitidos desde novembro de 2020\n      (inclusive) e guarda os dados desses funcionarios num ficheiro de texto */\nint admitidosDesdeNov2020(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)\n{\n    FILE *ficheiro;\n    int i, conta = 0;\n    tipoData d;\n\n    ficheiro = fopen(FICH_TEXTO, \"w\");\n    if (ficheiro == NULL)\n    {\n        printf(\"\\nErro ao abrir o ficheiro %s\\n\", FICH_TEXTO);\n    }\n    else\n    {\n        fprintf(ficheiro, \"Funcionarios admitidos desde novembro de 2020\\n\");\n        fprintf(ficheiro, \"Numero\\tNome\\tVencimento\\tData de admissao\\n\");\n    }\n\n    for (i = 0; i < quantFunc; i++)\n    {\n        d = vetor[i].dataAdmissao;\n        if (d.ano > 2020 || (d.ano == 2020 && d.mes >= 11))\n        {\n            conta++;\n            if (ficheiro != NULL)\n            {\n                fprintf(ficheiro, \"%d\\t%s\\t%.2f\\t%02d/%02d/%04d\\n\", vetor[i].numero, vetor[i].nome,\n                        vetor[i].vencimento, d.dia, d.mes, d.ano);\n            }\n        }\n    }\n\n    if (ficheiro != NULL)\n    {\n        fprintf(ficheiro, \"Total: %d\\n\", conta);\n        fclose(ficheiro);\n    }\n    return conta;\n}\n\n/* j) Altera o vencimento do funcionario com o numero indicado pelo utilizador */\nvoid alteraVencimento(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)\n{\n    int numero, pos;\n\n    if (quantFunc == 0)\n    {\n        printf(\"\\nNao existem funcionarios registados\\n\");\n    }\n    else\n    {\n        printf(\"Numero do funcionario: \");\n        numero = lerInteiro(1, 9999);\n        pos = procuraFuncionario(vetor, quantFunc, numero);\n        if (pos == -1)\n        {\n            printf(\"\\nNao existe nenhum funcionario com o numero %d\\n\", numero);\n        }\n        else\n        {\n            printf(\"Vencimento atual: %.2f euros\\n\", vetor[pos].vencimento);\n            printf(\"Novo vencimento (euros): \");\n            vetor[pos].vencimento = lerFloat(0, 100000);\n        }\n    }\n}\n\n/* k) Escreve num ficheiro binario os dados de todos os funcionarios */\nvoid gravaFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS], int quantFunc)\n{\n    FILE *ficheiro;\n    int quant;\n\n    ficheiro = fopen(FICH_BINARIO, \"wb\");\n    if (ficheiro == NULL)\n    {\n        printf(\"\\nErro ao abrir o ficheiro %s\\n\", FICH_BINARIO);\n    }\n    else\n    {\n        quant = fwrite(&quantFunc, sizeof(int), 1, ficheiro);\n        if (quant != 1)\n        {\n            printf(\"\\nErro ao escrever no ficheiro\\n\");\n        }\n        else\n        {\n            quant = fwrite(vetor, sizeof(tipoFuncionario), quantFunc, ficheiro);\n            if (quant != quantFunc)\n            {\n                printf(\"\\nErro ao escrever no ficheiro (%d de %d)\\n\", quant, quantFunc);\n            }\n            else\n            {\n                printf(\"\\nDados de %d funcionarios gravados em %s\\n\", quantFunc, FICH_BINARIO);\n            }\n        }\n        fclose(ficheiro);\n    }\n}\n\n/* l) Obtem do ficheiro binario os dados dos funcionarios; devolve a quantidade lida */\nint leFicheiroBinario(tipoFuncionario vetor[MAX_FUNCIONARIOS])\n{\n    FILE *ficheiro;\n    int quantFunc = 0, quant;\n\n    ficheiro = fopen(FICH_BINARIO, \"rb\");\n    if (ficheiro == NULL)\n    {\n        printf(\"\\nErro ao abrir o ficheiro %s\\n\", FICH_BINARIO);\n    }\n    else\n    {\n        quant = fread(&quantFunc, sizeof(int), 1, ficheiro);\n        if (quant != 1 || quantFunc < 0 || quantFunc > MAX_FUNCIONARIOS)\n        {\n            printf(\"\\nErro ao ler do ficheiro\\n\");\n            quantFunc = 0;\n        }\n        else\n        {\n            quant = fread(vetor, sizeof(tipoFuncionario), quantFunc, ficheiro);\n            if (quant != quantFunc)\n            {\n                printf(\"\\nErro ao ler do ficheiro (%d de %d)\\n\", quant, quantFunc);\n                quantFunc = 0;\n            }\n            else\n            {\n                printf(\"\\nDados de %d funcionarios lidos de %s\\n\", quantFunc, FICH_BINARIO);\n            }\n        }\n        fclose(ficheiro);\n    }\n    return quantFunc;\n}\n\n/************ Funcoes para leitura de dados ************/\n\nvoid limpaBufferStdin(void)\n{\n    int lixo;\n\n    do\n    {\n        lixo = getchar();\n    }\n    while (lixo != '\\n' && lixo != EOF);\n}\n\nint lerInteiro(int min, int max)\n{\n    int numero = 0, controlo;\n\n    do\n    {\n        controlo = scanf(\"%d\", &numero);\n        limpaBufferStdin();\n    }\n    while (numero < min || numero > max || controlo == 0);\n\n    return numero;\n}\n\nfloat lerFloat(float min, float max)\n{\n    float numero = 0;\n    int controlo;\n\n    do\n    {\n        controlo = scanf(\"%f\", &numero);\n        limpaBufferStdin();\n    }\n    while (numero < min || numero > max || controlo == 0);\n\n    return numero;\n}\n\nvoid lerString(char vetor[], int max)\n{\n    int tamanhoString;\n\n    do\n    {\n        fgets(vetor, max, stdin);\n        tamanhoString = strlen(vetor);\n    }\n    while (tamanhoString == 1);    /* repete se so foi introduzido o \\n */\n\n    if (vetor[tamanhoString - 1] != '\\n')\n    {\n        limpaBufferStdin();\n    }\n    else\n    {\n        vetor[tamanhoString - 1] = '\\0';\n    }\n}\n\ntipoData lerData(void)\n{\n    tipoData data;\n    int maxDiaMes;\n\n    printf(\"\\n Ano (%d a %d): \", 1950, 2026);\n    data.ano = lerInteiro(1950, 2026);\n\n    printf(\" Mes (%d a %d): \", 1, 12);\n    data.mes = lerInteiro(1, 12);\n\n    switch (data.mes)\n    {\n    case 2:\n        if ((data.ano % 400 == 0) || (data.ano % 4 == 0 && data.ano % 100 != 0))\n        {\n            maxDiaMes = 29;\n        }\n        else\n        {\n            maxDiaMes = 28;\n        }\n        break;\n    case 4:\n    case 6:\n    case 9:\n    case 11:\n        maxDiaMes = 30;\n        break;\n    default:\n        maxDiaMes = 31;\n    }\n    printf(\" Dia (%d a %d): \", 1, maxDiaMes);\n    data.dia = lerInteiro(1, maxDiaMes);\n\n    return data;\n}\n";
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+(function(){
+  const saved = store.get("tp_theme", null);
+  if (saved) document.documentElement.dataset.theme = saved;
+  document.getElementById("themeBtn").addEventListener("click", () => {
+    const cur = document.documentElement.dataset.theme ||
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const nxt = cur === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = nxt;
+    store.set("tp_theme", nxt);
+  });
+})();
+function showTab(name){
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
+  document.querySelectorAll("section.tab").forEach(s => s.classList.toggle("on", s.id === "tab-" + name));
+  store.set("tp_tab", name);
+  window.scrollTo(0, 0);
+}
+document.getElementById("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showTab(b.dataset.tab); });
+document.querySelectorAll(".toc a").forEach(a => a.addEventListener("click", e => {
+  e.preventDefault(); const t = document.querySelector(a.getAttribute("href")); if (t) t.scrollIntoView({behavior:"smooth"});
+}));
+document.querySelectorAll(".reveal").forEach(b => b.addEventListener("click", () => b.closest(".card").classList.remove("hidden-sol")));
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const msg = document.getElementById("copyMsg");
+  try { await navigator.clipboard.writeText(SRC); msg.textContent = "Copiado!"; }
+  catch(e){
+    const r = document.createRange(); r.selectNodeContents(document.getElementById("fullcode"));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    msg.textContent = "Código selecionado — usa Ctrl+C.";
+  }
+});
+document.getElementById("dlBtn").addEventListener("click", () => {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([SRC], {type:"text/x-c"}));
+  a.download = "main.c"; document.body.append(a); a.click(); a.remove();
+});
+showTab(store.get("tp_tab", "resolucao"));
+</script>
+</body>
+</html>
