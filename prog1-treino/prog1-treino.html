@@ -1639,7 +1639,7 @@ function qBody(q){
     h("p", {class:"qtxt", html:q.txt}),
     q.code ? h("pre", {class:"code"}, q.code) : null,
     q.ask ? h("p", {class:"qask", html:q.ask}) : null
-  ];
+  ].filter(Boolean);
 }
 /* opts: {hide, order, chosen, label} */
 function solutionCard(q, opts={}){

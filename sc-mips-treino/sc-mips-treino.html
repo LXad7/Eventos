@@ -1314,7 +1314,7 @@ function qHead(q, label){
     q.src === "orig" ? h("span", {class:"chip chip-o"}, "Teste de treino · P" + q.id.slice(1)) : h("span", {class:"chip chip-n"}, "Nova"));
 }
 function qBody(q){
-  return [ h("p", {class:"qtxt", html:q.txt, style:"margin:6px 0"}), q.code ? h("pre", {class:"code"}, q.code) : null ];
+  return [ h("p", {class:"qtxt", html:q.txt, style:"margin:6px 0"}), q.code ? h("pre", {class:"code"}, q.code) : null ].filter(Boolean);
 }
 /* opts: {hide, answers (array por campo) , label} */
 function solutionCard(q, opts={}){
